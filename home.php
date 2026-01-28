@@ -78,7 +78,7 @@
     <h2 class="section-title">About Us</h2>
     <div class="row">
       <div class="col-md-6">
-        <img src="dist/img/ph4.png" class="img-fluid rounded shadow" alt="About Property Hub">
+        <img src="dist/img/phLogo.jpg" class="img-fluid rounded shadow" alt="About Property Hub">
       </div>
       <div class="col-md-6 d-flex align-items-center">
         <p>
