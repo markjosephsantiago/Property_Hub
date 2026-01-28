@@ -115,12 +115,13 @@ $result = mysqli_query($conn, $sql);
                             <?php endif; ?>
 
                             <!-- Check-out -->
-                            <?php if ($status == 'checked in'): ?>
-                                <a href="bookingProcess/ctrl.update.status.php?id=<?= $row['reservation_id'] ?>&action=checkout&source=booking" 
-                                class="btn btn-sm btn-info"
-                                onclick="return confirm('Mark as Checked Out?');">
-                                Check Out
+                            <?php if ($status == 'checked in'): ?> 
+                                <a href="ctrl.checkout.php?reservation_id=<?= $row['reservation_id'] ?>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Confirm checkout?')">
+                                🧾 Checkout
                                 </a>
+
                             <?php endif; ?>
 
                             <!-- Cancel -->
