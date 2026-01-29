@@ -351,23 +351,27 @@
 
             <!-- Guest -->
           <?php
+          $active = null;
         } elseif ($_SESSION ['role'] == "Guest") {
+          $user_id = $_SESSION['user_id'];
+
+          $res = $conn->prepare("
+              SELECT reservation_id, room_id
+              FROM tbl_reservations
+              WHERE user_id = ?
+              AND status = 'checkin'
+              ORDER BY checkin DESC
+              LIMIT 1
+          ");
+          $res->bind_param("i", $user_id);
+          $res->execute();
+          $active = $res->get_result()->fetch_assoc();
           ?>
             <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="m-0">Dashboard</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard v1</li>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
+        
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
@@ -381,13 +385,22 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
-                <p>Book a room</p>
+                <h3>Order Food</h3>
+                <p>room service</p>
               </div>
               <div class="icon">
-                <i class="ion ion-bag"></i>
+                <i class="fas fa-utensils"></i>
               </div>
-              <a href="../booking/booking.form.php" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <?php if ($active): ?>
+                <a href="../food/food.menu.php?reservation_id=<?= $active['reservation_id'] ?>&room_id=<?= $active['room_id'] ?>"
+                  class="small-box-footer">
+                  Order Food <i class="fas fa-arrow-circle-right"></i>
+                </a>
+                <?php else: ?>
+                    <span class="small-box-footer text-danger">
+                      No active room
+                    </span>
+                <?php endif; ?>
             </div>
           </div>
           <?php

@@ -116,7 +116,7 @@ $result = mysqli_query($conn, $sql);
 
                             <!-- Check-out -->
                             <?php if ($status == 'checked in'): ?> 
-                                <a href="ctrl.checkout.php?reservation_id=<?= $row['reservation_id'] ?>"
+                                <a href="bookingProcess/ctrl.checkout.php?reservation_id=<?= $row['reservation_id'] ?>"
                                 class="btn btn-danger btn-sm"
                                 onclick="return confirm('Confirm checkout?')">
                                 🧾 Checkout

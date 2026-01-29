@@ -2,6 +2,9 @@
 session_start();
 require '../../includes/conn.php';
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 $reservation_id = $_GET['reservation_id'] ?? null;
 
 if (!$reservation_id) {
@@ -13,7 +16,7 @@ if (!$reservation_id) {
 $conn->begin_transaction();
 
 try {
-    // 1️⃣ Get reservation + room info
+    // 1️⃣ Reservation + room
     $stmt = $conn->prepare("
         SELECT r.*, rm.price, rm.room_id
         FROM tbl_reservations r
@@ -28,10 +31,10 @@ try {
         throw new Exception("Reservation not found");
     }
 
-    // 2️⃣ Compute room total
+    // 2️⃣ Room total
     $room_total = $booking['price'] * ($booking['duration'] / 24);
 
-    // 3️⃣ Compute food total
+    // 3️⃣ Food total
     $foodStmt = $conn->prepare("
         SELECT SUM(order_total) AS food_total
         FROM tbl_food_orders
@@ -55,14 +58,16 @@ try {
     $update->bind_param("di", $grand_total, $reservation_id);
     $update->execute();
 
-    // 6️⃣ Mark food orders as served
-    $conn->prepare("
+    // 6️⃣ Update food orders (FIXED)
+    $foodUpdate = $conn->prepare("
         UPDATE tbl_food_orders
         SET order_status = 'served'
         WHERE reservation_id = ?
-    ")->bind_param("i", $reservation_id)->execute();
+    ");
+    $foodUpdate->bind_param("i", $reservation_id);
+    $foodUpdate->execute();
 
-    // 7️⃣ Free the room
+    // 7️⃣ Free room
     $roomUpdate = $conn->prepare("
         UPDATE tbl_rooms
         SET status = 'available'
@@ -73,13 +78,12 @@ try {
 
     $conn->commit();
 
-    $_SESSION['success'] = "Checkout successful! Total bill: ₱" . number_format($grand_total, 2);
-    header("Location: checkout.receipt.php?reservation_id=" . $reservation_id);
+    header("Location: ../checkout.receipt.php?reservation_id=" . $reservation_id);
     exit();
 
 } catch (Exception $e) {
     $conn->rollback();
-    $_SESSION['error'] = "Checkout failed.";
-    header("Location: booking.list.php");
+    $_SESSION['error'] = "Checkout failed: " . $e->getMessage();
+    header("Location: ../booking.list.php");
     exit();
 }

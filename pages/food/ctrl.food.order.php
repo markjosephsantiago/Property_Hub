@@ -93,7 +93,7 @@ try {
     $conn->commit();
 
     $_SESSION['success'] = "🍽️ Food order placed successfully!";
-    header("Location: food.success.php?order_id=" . $order_id);
+    header("Location: food.success.php?reservation _id=" . $reservation_id);
     exit();
 
 } catch (Exception $e) {

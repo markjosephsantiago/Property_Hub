@@ -6,9 +6,9 @@ session_start();
 $reservation_id = $_GET['reservation_id'] ?? null;
 $room_id = $_GET['room_id'] ?? null;
 
-if (!$reservation_id || !$room_id) {
-    die("Invalid access.");
-}
+// if (!$reservation_id || !$room_id) {
+//     die("Invalid access.");
+// }
 
 // Fetch available food
 $foods = mysqli_query($conn, "SELECT * FROM tbl_food_menu WHERE status = 'available'");
