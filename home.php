@@ -78,11 +78,11 @@
     <h2 class="section-title">About Us</h2>
     <div class="row">
       <div class="col-md-6">
-        <img src="dist/img/phLogo.jpg" class="img-fluid rounded shadow" alt="About Property Hub">
+        <img src="dist/img/fh.png" class="img-fluid rounded shadow" alt="About Franciscan Hoteliers">
       </div>
       <div class="col-md-6 d-flex align-items-center">
         <p>
-          Property Hub is your one-stop platform for room booking and property management.  
+          Franciscan Hoteliers is your one-stop platform for room booking and property management.  
           We provide seamless reservations, secure transactions, and a user-friendly interface 
           designed to make managing your stay more convenient and enjoyable.
         </p>

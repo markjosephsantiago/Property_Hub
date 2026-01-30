@@ -126,7 +126,7 @@ $result = $conn->query($query);
 
                 <!-- ✅ Check-out button -->
                 <?php if ($row['status'] == 'checkin'): ?>
-                  <a href="bookingProcess/ctrl.update.status.php?id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
+                  <a href="../booking/checkout.receipt.php?reservation_id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
                     class="btn btn-sm btn-info">Check Out</a>
                 <?php endif; ?>
 

@@ -75,8 +75,7 @@ try {
         (user_id, reservation_id, room_id, guest_name, order_total, order_status)
         VALUES (?, ?, ?, ?, ?, 'pending')
     ");
-    $stmt->bind_param(
-        "iiisd",
+    $stmt->bind_param("iiisd",
         $user_id,
         $reservation_id,
         $room_id,
@@ -107,35 +106,32 @@ try {
         $itemStmt->execute();
     }
 
+    // 🔔 Insert notification for Admin & Employee
+    $notif = $conn->prepare("
+        INSERT INTO tbl_notifications (user_role, message, link)
+        VALUES (?, ?, ?)
+    ");
+
+    $msg  = "New food order from Room $room_id";
+    $link = "../food/food.orders.list.php";
+
+    foreach (['admin','employee'] as $role) {
+        $notif->bind_param("sss", $role, $msg, $link);
+        $notif->execute();
+    }
+
     $conn->commit();
 
-    $_SESSION['food_status'] = 'success';
+    $_SESSION['food_status']  = 'success';
     $_SESSION['food_message'] = '🍽️ Food order placed successfully!';
     header("Location: food.menu.php?reservation_id=$reservation_id&room_id=$room_id");
     exit();
 
-    // 🔔 Insert notification for Admin & Employee
-    $notif = $conn->prepare("
-        INSERT INTO tbl_notifications (user_role, message, link)
-        VALUES 
-        ('Admin', ?, ?),
-        ('Employee', ?, ?)
-    ");
-
-    $msg = "New food order placed (Room {$room_id})";
-    $link = "food/food.orders.list.php";
-
-    $notif->bind_param("ssss", $msg, $link, $msg, $link);
-    $notif->execute();
-
-
-
 } catch (Exception $e) {
     $conn->rollback();
 
-    $_SESSION['food_status'] = 'error';
-    $_SESSION['food_message'] = '❌ Food order failed. Please try again.';
+    $_SESSION['food_status']  = 'error';
+    $_SESSION['food_message'] = '❌ Food order failed.';
     header("Location: food.menu.php?reservation_id=$reservation_id&room_id=$room_id");
     exit();
-
 }
