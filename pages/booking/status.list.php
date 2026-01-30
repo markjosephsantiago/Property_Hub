@@ -45,6 +45,12 @@ $result = $conn->query($query);
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper p-4">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+    <?php include '../../includes/back.button.php';?>
+</head>
 
   <h3 class="mb-4"><?= htmlspecialchars($title) ?></h3>
 

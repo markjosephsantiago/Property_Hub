@@ -20,13 +20,7 @@ $result = mysqli_query($conn, $sql);
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Booking List</title>
-    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-    <?php include '../../includes/back.button.php';?>
-</head>
+
 <body class="hold-transition sidebar-mini">
 
 <div class="container mt-5">

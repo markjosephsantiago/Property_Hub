@@ -67,6 +67,6 @@ try {
     $_SESSION['error'] = "Error updating status: " . $e->getMessage();
 }
 
-header("Location: ../booking.list.php");
+header("Location: ../status.list.php?filter=?");
 exit();
 ?>

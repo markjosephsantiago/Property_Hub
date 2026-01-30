@@ -112,7 +112,7 @@
         <!-- All Users (except Admin): My Bookings -->
         <?php if ($_SESSION['role'] != "Admin"): ?>
         <li class="nav-item">
-          <a href="../booking/booking.list.php" class="nav-link">
+          <a href="../booking/status.list.php" class="nav-link">
             <i class="nav-icon fas fa-calendar-check"></i><p>My Bookings</p>
           </a>
         </li>
