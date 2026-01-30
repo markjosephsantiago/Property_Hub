@@ -1,29 +1,36 @@
 <?php
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../login.php");
+    exit;
+}
+
 require '../../includes/conn.php';
 
+$user_id = $_SESSION['user_id'];
 $reservation_id = $_GET['reservation_id'] ?? null;
 
 if (!$reservation_id) {
     die("Invalid receipt request.");
 }
 
-// 🔹 Reservation + Room
+/* RESERVATION MUST BELONG TO LOGGED-IN USER */
 $stmt = $conn->prepare("
     SELECT r.*, rm.room_number, rm.room_type, rm.price
     FROM tbl_reservations r
     JOIN tbl_rooms rm ON rm.room_id = r.room_id
     WHERE r.reservation_id = ?
+    AND r.user_id = ?
 ");
-$stmt->bind_param("i", $reservation_id);
+$stmt->bind_param("ii", $reservation_id, $user_id);
 $stmt->execute();
 $booking = $stmt->get_result()->fetch_assoc();
 
 if (!$booking) {
-    die("Reservation not found.");
+    die("Unauthorized or reservation not found.");
 }
 
-// 🔹 Food total
+/* FOOD TOTAL (USER-SAFE VIA RESERVATION) */
 $foodStmt = $conn->prepare("
     SELECT SUM(order_total) AS food_total
     FROM tbl_food_orders
@@ -34,10 +41,11 @@ $foodStmt->bind_param("i", $reservation_id);
 $foodStmt->execute();
 $food_total = $foodStmt->get_result()->fetch_assoc()['food_total'] ?? 0;
 
-// 🔹 Totals
-$room_total = $booking['price'] * ($booking['duration'] / 24);
+/* TOTALS */
+$room_total  = $booking['price'] * ($booking['duration'] / 24);
 $grand_total = $room_total + $food_total;
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>

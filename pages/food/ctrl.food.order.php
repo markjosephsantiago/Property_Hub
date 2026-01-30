@@ -1,6 +1,15 @@
 <?php
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
 require '../../includes/conn.php';
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Invalid request");
@@ -63,13 +72,21 @@ try {
     // 1️⃣ INSERT PARENT ORDER
     $stmt = $conn->prepare("
         INSERT INTO tbl_food_orders 
-        (reservation_id, room_id, guest_name, order_total, order_status)
-        VALUES (?, ?, ?, ?, 'pending')
+        (user_id, reservation_id, room_id, guest_name, order_total, order_status)
+        VALUES (?, ?, ?, ?, ?, 'pending')
     ");
-    $stmt->bind_param("iisd", $reservation_id, $room_id, $guest_name, $order_total);
+    $stmt->bind_param(
+        "iiisd",
+        $user_id,
+        $reservation_id,
+        $room_id,
+        $guest_name,
+        $order_total
+    );
     $stmt->execute();
 
     $order_id = $conn->insert_id;
+
 
     // 2️⃣ INSERT CHILD ITEMS
     $itemStmt = $conn->prepare("
@@ -92,13 +109,33 @@ try {
 
     $conn->commit();
 
-    $_SESSION['success'] = "🍽️ Food order placed successfully!";
-    header("Location: food.success.php?reservation _id=" . $reservation_id);
+    $_SESSION['food_status'] = 'success';
+    $_SESSION['food_message'] = '🍽️ Food order placed successfully!';
+    header("Location: food.menu.php?reservation_id=$reservation_id&room_id=$room_id");
     exit();
+
+    // 🔔 Insert notification for Admin & Employee
+    $notif = $conn->prepare("
+        INSERT INTO tbl_notifications (user_role, message, link)
+        VALUES 
+        ('Admin', ?, ?),
+        ('Employee', ?, ?)
+    ");
+
+    $msg = "New food order placed (Room {$room_id})";
+    $link = "food/food.orders.list.php";
+
+    $notif->bind_param("ssss", $msg, $link, $msg, $link);
+    $notif->execute();
+
+
 
 } catch (Exception $e) {
     $conn->rollback();
-    $_SESSION['error'] = "Food order failed.";
-    header("Location: food.menu.php");
+
+    $_SESSION['food_status'] = 'error';
+    $_SESSION['food_message'] = '❌ Food order failed. Please try again.';
+    header("Location: food.menu.php?reservation_id=$reservation_id&room_id=$room_id");
     exit();
+
 }

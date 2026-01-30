@@ -37,6 +37,57 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
   <!-- Right navbar links -->
   <ul class="navbar-nav ml-auto">
 
+    <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin','Employee'])): ?>
+
+<?php
+$notifCount = 0;
+$notifList = [];
+
+$res = $conn->prepare("
+    SELECT message, link, created_at
+    FROM tbl_notifications
+    WHERE user_role = ?
+    AND is_read = 0
+    ORDER BY created_at DESC
+    LIMIT 5
+");
+$res->bind_param("s", $_SESSION['role']);
+$res->execute();
+$notifList = $res->get_result();
+$notifCount = $notifList->num_rows;
+?>
+
+<li class="nav-item dropdown">
+  <a class="nav-link" data-toggle="dropdown" href="#">
+    <i class="far fa-bell"></i>
+    <?php if ($notifCount > 0): ?>
+      <span class="badge badge-danger navbar-badge"><?= $notifCount ?></span>
+    <?php endif; ?>
+  </a>
+
+  <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+    <span class="dropdown-header"><?= $notifCount ?> Notifications</span>
+
+    <?php while ($n = $notifList->fetch_assoc()): ?>
+      <a href="<?= $n['link'] ?>" class="dropdown-item">
+        <i class="fas fa-utensils mr-2"></i>
+        <?= htmlspecialchars($n['message']) ?>
+        <span class="float-right text-muted text-sm">
+          <?= date("H:i", strtotime($n['created_at'])) ?>
+        </span>
+      </a>
+      <div class="dropdown-divider"></div>
+    <?php endwhile; ?>
+
+    <a href="../notifications/mark.all.read.php"
+       class="dropdown-item dropdown-footer">
+       Mark all as read
+    </a>
+  </div>
+</li>
+
+<?php endif; ?>
+
     <!-- Messages Dropdown -->
     <?php
     $latest_messages = [];

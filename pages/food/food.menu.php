@@ -1,6 +1,12 @@
 <?php
 include '../../includes/conn.php';
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../login.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
 
 // REQUIRED: reservation_id & room_id
 $reservation_id = $_GET['reservation_id'] ?? null;
@@ -111,6 +117,25 @@ function calculate() {
     document.getElementById('grandTotal').innerText = total.toFixed(2);
 }
 </script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php if (isset($_SESSION['food_status'])): ?>
+<script>
+Swal.fire({
+    icon: '<?= $_SESSION['food_status'] ?>',
+    title: '<?= $_SESSION['food_status'] === "success" ? "Success!" : "Error!" ?>',
+    text: '<?= $_SESSION['food_message'] ?>',
+    confirmButtonColor: '#28a745'
+});
+</script>
+<?php
+unset($_SESSION['food_status']);
+unset($_SESSION['food_message']);
+endif;
+?>
+
 
 </body>
 </html>
