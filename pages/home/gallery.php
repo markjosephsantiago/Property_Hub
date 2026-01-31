@@ -15,5 +15,5 @@
   </div>
 </section>
 <footer>
-  &copy; <?php echo date('Y'); ?> Property Hub. All rights reserved.
+  &copy; <?php echo date('Y'); ?> Franciscan Hoteliers. All rights reserved.
 </footer>

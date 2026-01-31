@@ -185,38 +185,37 @@
   width: 100%;
 }
   .status-box {
-    background-color: #fff8e7;
-    border: 2px solid #d6c6a1;
+    background-color: white;
+    border: 2px solid #dc143c;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+    box-shadow: 0 2px 8px rgba(220, 20, 60, 0.1);
     overflow: hidden;
     text-align: center;
     padding: 5px;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     margin-bottom: 15px;
   }
 
   .status-box:hover {
-    background-color: #f1e6c6;
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(220, 20, 60, 0.2);
   }
 
   .status-header {
-    background-color: #d9d9d9;
-    color: #000;
+    background-color: #dc143c;
+    color: white;
     font-weight: bold;
     font-size: 20px;
     padding: 35px;
-    border-radius: 8px 8px 0 0 ;
-    border-bottom: 1px solid #ccc;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #b91230;
   }
 
   .status-body {
-    background-color: transparent;
+    background-color: white;
     font-size: 20px;
     font-weight: 700;
-    color: #000;
+    color: #333;
     padding: 20px;
   }
 
@@ -226,9 +225,9 @@
   }
 
   .content-wrapper {
-    background-color: #f8f3e9 !important;
+    background-color: #f8f9fa !important;
   }
-  /* === Property Hub Registration Page === */
+  /* === Franciscan Reservation Registration Page === */
 .register-wrapper {
   min-height: 100vh;
   display: flex;

@@ -8,7 +8,7 @@ require '../../includes/conn.php';
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Property Hub | Registration</title>
+  <title>Franciscan Reservation | Registration</title>
 
   <?php require '../../includes/link.php'; ?>
 </head>
@@ -16,7 +16,7 @@ require '../../includes/conn.php';
 <body class="register-wrapper">
   <div class="register-card">
     <div class="register-header">
-      Property Hub — Registration
+      Franciscan Reservation — Registration
     </div>
 
     <div class="register-body">

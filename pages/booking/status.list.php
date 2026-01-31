@@ -40,7 +40,7 @@ $result = $conn->query($query);
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><?= htmlspecialchars($title) ?> | Property Hub</title>
+  <title><?= htmlspecialchars($title) ?> | Franciscan Reservation</title>
   <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
@@ -126,7 +126,7 @@ $result = $conn->query($query);
 
                 <!-- ✅ Check-out button -->
                 <?php if ($row['status'] == 'checkin'): ?>
-                  <a href="../booking/checkout.receipt.php?reservation_id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
+                  <a href="../booking/payment.form.php?reservation_id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
                     class="btn btn-sm btn-info">Check Out</a>
                 <?php endif; ?>
 

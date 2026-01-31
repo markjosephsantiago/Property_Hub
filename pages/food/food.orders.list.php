@@ -141,7 +141,7 @@ $orders = $conn->query("
 
 <!-- Footer -->
 <footer class="main-footer text-center">
-  <strong>Property Hub</strong> © <?= date('Y') ?>
+  <strong>Franciscan Hoteliers</strong> © <?= date('Y') ?>
 </footer>
 
 </div>

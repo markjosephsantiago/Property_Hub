@@ -61,11 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('your_email@gmail.com', 'Property Hub');
+            $mail->setFrom('your_email@gmail.com', 'Franciscan Hoteliers');
             $mail->addAddress($payment['guestEmail'], $payment['guestName']);
 
             $mail->isHTML(true);
-            $mail->Subject = 'Payment Receipt - Property Hub';
+            $mail->Subject = 'Payment Receipt - Franciscan Hoteliers';
             $mail->Body = "
                 <h2>Payment Receipt</h2>
                 <p>Dear {$payment['guestName']},</p>
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <tr><td><b>Payment Method:</b></td><td>{$payment['payment_method']}</td></tr>
                     <tr><td><b>Date Paid:</b></td><td>{$payment['date_paid']}</td></tr>
                 </table>
-                <p>We look forward to serving you.<br><b>Property Hub Team</b></p>
+                <p>We look forward to serving you.<br><b>Franciscan Hoteliers Team</b></p>
             ";
 
             $mail->send();

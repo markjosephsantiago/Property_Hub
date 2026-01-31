@@ -1,8 +1,8 @@
 <aside class="main-sidebar sidebar-dark-beige elevation-4">
   <!-- Brand Logo -->
   <a href="../dashboard/index.php" class="brand-link">
-    <img src="../../dist/img/ph1.png" alt="Property Hub Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-    <span class="brand-text font-weight-light">Property Hub</span>
+    <img src="../../dist/img/FHLoginIcon.png" alt="Franciscan Reservation Logo" class="brand-image elevation-3" style="opacity: .8; max-width: 100%; height: auto;">
+    <span class="brand-text font-weight-light">Franciscan Reservation</span>
   </a>
 
   <!-- Sidebar -->

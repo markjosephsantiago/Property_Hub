@@ -86,7 +86,7 @@ $booking = $result->fetch_assoc();
         </table>
 
         <div class="text-center mt-4">
-            <a href="../../home.php" class="btn btn-success"><i class="fas fa-home"></i> Back to Dashboard</a>
+            <a href="../../index.php" class="btn btn-success"><i class="fas fa-home"></i> Back to Dashboard</a>
             <a href="booking.form.php" class="btn btn-outline-secondary"><i class="fas fa-plus"></i> New Booking</a>
             <a href="../food/food.menu.php?reservation_id=<?= $booking['reservation_id'] ?>&room_id=<?= $booking['room_id'] ?>"
             class="btn btn-warning ml-2">

@@ -8,7 +8,7 @@ require '../../includes/conn.php';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Property Hub | Users List</title>
+    <title>Franciscan Reservation | Users List</title>
     <?php require '../../includes/link.php'; ?>
 </head>
 

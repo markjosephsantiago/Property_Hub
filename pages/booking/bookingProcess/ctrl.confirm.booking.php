@@ -9,7 +9,7 @@ ini_set('display_errors', 1);
 // ✅ Role check
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Employee'])) {
     $_SESSION['error'] = "Access denied.";
-    header("Location: ../booking.list.php");
+    header("Location: ../status.list.php");
     exit();
 }
 
