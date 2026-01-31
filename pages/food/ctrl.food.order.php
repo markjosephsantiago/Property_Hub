@@ -25,7 +25,7 @@ if (!$reservation_id || !$room_id || empty($quantities)) {
     exit();
 }
 
-// 🔹 Get guest name from reservation
+// Get guest name from reservation
 $res = $conn->prepare("SELECT guestName FROM tbl_reservations WHERE reservation_id = ?");
 $res->bind_param("i", $reservation_id);
 $res->execute();
@@ -36,7 +36,7 @@ $guest_name = $resData['guestName'] ?? 'Guest';
 $order_total = 0;
 $order_items = [];
 
-// 🔹 Compute total + prepare items
+// Compute total + prepare items
 foreach ($quantities as $food_id => $qty) {
     if ($qty > 0) {
         $food = $conn->query(
@@ -59,7 +59,7 @@ foreach ($quantities as $food_id => $qty) {
     }
 }
 
-// 🚫 No items ordered
+// No items ordered
 if (empty($order_items)) {
     $_SESSION['error'] = "Please select at least one food item.";
     header("Location: food.menu.php?reservation_id=$reservation_id&room_id=$room_id");
@@ -69,7 +69,7 @@ if (empty($order_items)) {
 $conn->begin_transaction();
 
 try {
-    // 1️⃣ INSERT PARENT ORDER
+    // INSERT FOOD ORDER
     $stmt = $conn->prepare("
         INSERT INTO tbl_food_orders 
         (user_id, reservation_id, room_id, guest_name, order_total, order_status)
@@ -87,7 +87,7 @@ try {
     $order_id = $conn->insert_id;
 
 
-    // 2️⃣ INSERT CHILD ITEMS
+    // INSERT ORDER ITEMS
     $itemStmt = $conn->prepare("
         INSERT INTO tbl_food_order_items
         (order_id, food_name, food_price, quantity, subtotal)

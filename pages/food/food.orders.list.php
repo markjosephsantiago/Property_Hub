@@ -100,12 +100,20 @@ $orders = $conn->query("
   <td><?= date("M d, Y h:i A", strtotime($row['created_at'])) ?></td>
 
   <td>
-    <?php if ($row['order_status'] == 'preparing'): ?>
-      <a href="food.status.php?id=<?= $row['order_id'] ?>&status=served"
-         class="btn btn-success btn-sm"
-         onclick="return confirm('Mark this order as SERVED?')">
-         <i class="fas fa-check"></i> Served
+    <?php if ($row['order_status'] == 'pending'): ?>
+      <a href="food.status.php?id=<?= $row['order_id'] ?>&status=preparing"
+        class="btn btn-warning btn-sm"
+        onclick="return confirm('Start preparing this order?')">
+        <i class="fas fa-fire"></i> Prepare
       </a>
+
+    <?php elseif ($row['order_status'] == 'preparing'): ?>
+      <a href="food.status.php?id=<?= $row['order_id'] ?>&status=served"
+        class="btn btn-success btn-sm"
+        onclick="return confirm('Mark this order as SERVED?')">
+        <i class="fas fa-check"></i> Served
+      </a>
+
     <?php else: ?>
       <button class="btn btn-secondary btn-sm" disabled>
         <i class="fas fa-check"></i> Done
