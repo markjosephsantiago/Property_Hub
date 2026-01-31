@@ -13,7 +13,7 @@ error_reporting(E_ALL);
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Property Hub | Log in</title>
+  <title>Franciscan Hoteliers | Log in</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet"
@@ -49,7 +49,7 @@ error_reporting(E_ALL);
     <div class="card card-outline card-danger">
       <div class="card-header text-center">
         <div class="sfac-logo">
-          <img src="../../dist/img/ph1.png" alt="ph1" style="width:150px;height:150px;">
+          <img src="../../dist/img/FHLoginIcon.png" alt="ph1" style="width:auto;max-width:250px;height:auto;">
       <div class="card-body">
         <p class="login-box-msg">Sign in to your account.</p>
         <form action="usersData/ctrl.login.php" method="POST">

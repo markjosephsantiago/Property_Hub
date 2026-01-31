@@ -14,7 +14,7 @@ $action = $_GET['action'] ?? null;
 
 if (!$id || !$action) {
     $_SESSION['error'] = "Invalid request.";
-    header("Location: ../booking.list.php");
+    header("Location: ../status.list.php");
     exit();
 }
 

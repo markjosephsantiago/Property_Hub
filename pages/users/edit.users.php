@@ -23,7 +23,7 @@ if (!$user) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Property Hub | Edit User</title>
+  <title>Franciscan Reservation | Edit User</title>
   <?php require '../../includes/link.php'; ?>
 </head>
 <body class="hold-transition sidebar-mini">

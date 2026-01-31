@@ -112,7 +112,7 @@ $result = mysqli_query($conn, $query);
 
                 <!-- Submit -->
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-arrow-right"></i> Proceed
+                    <i href= "../booking/payment.form.php" class="fas fa-arrow-right"></i> Proceed
                 </button>
 
                 <!-- Recommendation Area -->

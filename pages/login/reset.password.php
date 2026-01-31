@@ -26,14 +26,14 @@ $user = mysqli_fetch_assoc($result);
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Reset Password | Property Hub</title>
+  <title>Reset Password | Franciscan Hoteliers</title>
   <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 </head>
 <body class="hold-transition login-page">
 
 <div class="login-box">
   <div class="login-logo">
-    <b>Property Hub</b> Password Reset
+    <b>Franciscan Hoteliers</b> Password Reset
   </div>
   <div class="card">
     <div class="card-body login-card-body">

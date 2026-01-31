@@ -30,8 +30,20 @@ if ($result->num_rows === 0) {
 
 $booking = $result->fetch_assoc();
 
-// ✅ Compute total price (price per 24h * hours_booked / 24)
-$total_price = ($booking['price'] / 24) * $booking['duration'];
+// 🔹 Food total
+$foodStmt = $conn->prepare("
+    SELECT SUM(order_total) AS food_total
+    FROM tbl_food_orders
+    WHERE reservation_id = ?
+    AND order_status != 'cancelled'
+");
+$foodStmt->bind_param("i", $reservation_id);
+$foodStmt->execute();
+$food_total = $foodStmt->get_result()->fetch_assoc()['food_total'] ?? 0;
+
+// ✅ Compute total price (room charge + food orders)
+$room_total = ($booking['price'] / 24) * $booking['duration'];
+$total_price = $room_total + $food_total;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,10 +92,12 @@ $total_price = ($booking['price'] / 24) * $booking['duration'];
             <tr><th>Check-in</th><td><?= date("F d, Y h:i A", strtotime($booking['checkin'])) ?></td></tr>
             <tr><th>Check-out</th><td><?= date("F d, Y h:i A", strtotime($booking['checkout'])) ?></td></tr>
             <tr><th>Duration</th><td><?= $booking['duration'] ?> hour(s)</td></tr>
-            <tr><th>Total Price</th><td><strong>₱<?= number_format($total_price, 2) ?></strong></td></tr>
+            <tr><th>Room Charge</th><td><strong>₱<?= number_format($room_total, 2) ?></strong></td></tr>
+            <tr><th>Food Orders</th><td><strong>₱<?= number_format($food_total, 2) ?></strong></td></tr>
+            <tr style="background-color: #e8f5e9;"><th>Total Price</th><td><strong style="color: #2e7d32;">₱<?= number_format($total_price, 2) ?></strong></td></tr>
         </table>
 
-        <form action="../bookingProcess/ctrl.payment.php" method="POST">
+        <form action="../booking/status.list.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
             <input type="hidden" name="reservation_id" value="<?= $reservation_id ?>">
             <input type="hidden" name="amount" value="<?= $total_price ?>">
 

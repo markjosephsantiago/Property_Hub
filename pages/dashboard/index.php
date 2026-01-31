@@ -8,7 +8,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Property Hub | Dashboard</title>
+  <title>Franciscan Reservation | Dashboard</title>
 
   <?php require '../../includes/link.php';?>
 
@@ -30,11 +30,10 @@
 
   <?php
         if($_SESSION['role'] == "Admin") {
-          include '../booking/auto.checkout.php';
         ?>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+  <div class="content-wrapper" style="background-color: #f8f9fa; min-height: 100vh;">
     <!-- Content Header (Page header) -->
     <div class="content-header">
       <div class="container-fluid">
@@ -45,7 +44,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard v1</li>
+              <li class="breadcrumb-item active">Dashboard</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -80,38 +79,18 @@
             </a>
           </div>
 
-          <!-- Bounce Rate -->
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <a href="../dashboard/dbscan.dashboard.php" class="text-decoration-none">
-              <div class="status-box">
-                <div class="status-header">Dbscan</div>
-                <div class="status-body">Clustering Dashboard</div>
-              </div>
-            </a>
-          </div>
-
           <!-- User Registrations -->
           <div class="col-lg-3 col-md-4 col-sm-6">
             <a href="../users/add.users.php" class="text-decoration-none">
               <div class="status-box">
                 <div class="status-header">User Registrations</div>
-                <div class="status-body">44</div>
+                <div class="status-body">Manage Users</div>
               </div>
             </a>
           </div>
 
-          <!-- Unique Visitors -->
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <a href="../analytics/view.outliers.php" class="text-decoration-none">
-              <div class="status-box">
-                <div class="status-header">Reservation Analysis</div>
-                <div class="status-body">Run Outliers</div>
-              </div>
-            </a>
-          </div>
-
+          <!-- Available Rooms -->
           <?php
-          // Available rooms
           $available_rooms = $conn->query("SELECT COUNT(*) AS total FROM tbl_rooms WHERE status = 'available'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -122,8 +101,9 @@
               </div>
             </a>
           </div>
+
+          <!-- Occupied Rooms -->
           <?php
-          // Occupied rooms
           $occupied_rooms = $conn->query("SELECT COUNT(*) AS total FROM tbl_rooms WHERE status = 'occupied'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -135,8 +115,8 @@
             </a>
           </div>
 
+          <!-- Maintenance -->
           <?php
-          // Maintenance
           $maintenance = $conn->query("SELECT COUNT(*) AS total FROM tbl_rooms WHERE status = 'maintenance'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -148,8 +128,8 @@
             </a>
           </div>
 
+          <!-- Check-in -->
           <?php
-          // All check-ins (confirmed)
           $checkin = $conn->query("SELECT COUNT(*) AS total FROM tbl_reservations WHERE status = 'checkin'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -161,8 +141,8 @@
             </a>
           </div>
 
+          <!-- Check-out -->
           <?php
-          // All checkouts (cancelled)
           $checkout = $conn->query("SELECT COUNT(*) AS total FROM tbl_reservations WHERE status = 'checkout'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -174,8 +154,8 @@
             </a>
           </div>
 
+          <!-- Pending Reservations -->
           <?php
-          // Pending / new reservations
           $new_reservations = $conn->query("SELECT COUNT(*) AS total FROM tbl_reservations WHERE status = 'pending'")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
@@ -186,6 +166,7 @@
               </div>
             </a>
           </div>
+
           <?php
           // count records per cluster
           $query = "SELECT cluster_label, COUNT(*) AS total FROM tbl_reservations GROUP BY cluster_label ORDER BY cluster_label";
@@ -199,64 +180,54 @@
             $counts[] = $row['total'];
           }
           ?>
-          <div class="col-lg-6 col-md-12 ms-0">
-            <div class="status-box" style="padding: 30px;">
-              <div class="status-header">DBSCAN Cluster Overview</div>
-              <div class="status-body">
-                <canvas id="dbscanChart" style="width:100%; height:300px;"></canvas>
-              </div>
-            </div>
-          </div>
 
-          <?php
-          // Example query (update table/column names as needed)
-          $clusterData = $conn->query("SELECT cluster_label, COUNT(*) AS total FROM tbl_reservations GROUP BY cluster_label");
-
-          // Store for Chart.js
-          $clusters = [];
-          $counts = [];
-
-          while ($row = $clusterData->fetch_assoc()) {
-            $clusters[] = "Cluster " . $row['cluster_label'];
-            $counts[] = (int)$row['total'];
-          }
-          ?>
-
-          <div class="card p-4 text-dark rounded-3" style="max-width: 800px; background-color: #d6c6a1;">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0">
-                <i class="fas fa-project-diagram me-2"></i> DBSCAN Cluster Overview
+          <div class="col-12">
+            <div class="card p-4 text-dark rounded-3" style="background-color: #f8f9fa; border: 3px solid #dc143c; box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);">
+              <h5 class="mb-4" style="color: #dc143c; font-size: 22px;">
+                <i class="fas fa-project-diagram me-2"></i> DBSCAN Cluster Analysis
               </h5>
-            </div>
 
-            <!-- Line Chart -->
-            <canvas id="dbscanLineChart" style="width:100%; height:250px;"></canvas>
+              <div class="row">
+                <!-- Bar Chart -->
+                <div class="col-lg-6 col-md-12">
+                  <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c;">
+                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Cluster Overview</h6>
+                    <canvas id="dbscanChart" style="width:100%; max-height:280px;"></canvas>
+                  </div>
+                </div>
 
-            <!-- Donut charts -->
-            <div class="d-flex justify-content-around text-center mt-4 flex-wrap">
-              <div>
-                <canvas id="cluster1Chart" width="80" height="80"></canvas>
-                <p class="mt-2 text-dark">Cluster 1</p>
-              </div>
-              <div>
-                <canvas id="cluster2Chart" width="80" height="80"></canvas>
-                <p class="mt-2 text-dark">Cluster 2</p>
-              </div>
-              <div>
-                <canvas id="cluster3Chart" width="80" height="80"></canvas>
-                <p class="mt-2 text-dark">Cluster 3</p>
+                <!-- Line Chart & Donut Charts Combined -->
+                <div class="col-lg-6 col-md-12">
+                  <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c; height: 100%;">
+                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Distribution Trend & Analysis</h6>
+                    <canvas id="dbscanLineChart" style="width:100%; max-height:250px; margin-bottom: 20px;"></canvas>
+
+                    <div class="d-flex justify-content-around text-center flex-wrap gap-2">
+                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #dc143c;">
+                        <canvas id="cluster1Chart" width="70" height="70"></canvas>
+                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 1</p>
+                      </div>
+                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #ff6b6b;">
+                        <canvas id="cluster2Chart" width="70" height="70"></canvas>
+                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 2</p>
+                      </div>
+                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #ffa500;">
+                        <canvas id="cluster3Chart" width="70" height="70"></canvas>
+                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 3</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-        </div>
         
 
   <!-- Employee -->
   <?php
         } elseif ($_SESSION['role'] == "Employee") {
         ?>
-        <div class="content-wrapper" style="background-color: #f5efe6; min-height: 100vh;">
+        <div class="content-wrapper" style="background-color: #f8f9fa; min-height: 100vh;">
           <section class="content">
             <div class="container-fluid p-4">
 
@@ -348,7 +319,6 @@
             </div>
           </section>
         </div>
-
             <!-- Guest -->
           <?php
           $active = null;
@@ -527,12 +497,14 @@ document.addEventListener('DOMContentLoaded', function () {
       datasets: [{
         label: 'Cluster Size',
         data: counts,
-        borderColor: '#fff',
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderColor: '#dc143c',
+        backgroundColor: 'rgba(220, 20, 60, 0.15)',
         fill: true,
         tension: 0.4,
-        pointBackgroundColor: '#fff',
-        pointBorderWidth: 2
+        pointBackgroundColor: '#dc143c',
+        pointBorderWidth: 2,
+        pointBorderColor: '#fff',
+        pointRadius: 6
       }]
     },
     options: {
@@ -540,11 +512,11 @@ document.addEventListener('DOMContentLoaded', function () {
       plugins: { legend: { display: false } },
       scales: {
         x: {
-          ticks: { color: '#fff', maxRotation: 45, minRotation: 45 }
+          ticks: { color: '#333', maxRotation: 45, minRotation: 45 }
         },
         y: {
-          ticks: { color: '#fff' },
-          grid: { color: 'rgba(255,255,255,0.3)' },
+          ticks: { color: '#333' },
+          grid: { color: 'rgba(220, 20, 60, 0.1)' },
           beginAtZero: true
         }
       }
@@ -554,26 +526,61 @@ document.addEventListener('DOMContentLoaded', function () {
   // ===== DONUT CHARTS =====
   function createDonutChart(id, value, color) {
     const ctx = document.getElementById(id).getContext('2d');
+    
+    // Calculate percentage
+    const maxValue = Math.max(...counts);
+    const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+    
+    const centerPlugin = {
+      id: 'centerText',
+      afterDatasetsDraw(chart) {
+        const { ctx: chartCtx, chartArea: { left, top, width, height } } = chart;
+        chartCtx.save();
+        
+        const centerX = left + width / 2;
+        const centerY = top + height / 2;
+        
+        // Draw value
+        chartCtx.font = 'bold 18px Arial';
+        chartCtx.fillStyle = '#dc143c';
+        chartCtx.textAlign = 'center';
+        chartCtx.textBaseline = 'middle';
+        chartCtx.fillText(value, centerX, centerY - 5);
+        
+        // Draw percentage
+        chartCtx.font = 'bold 12px Arial';
+        chartCtx.fillStyle = '#666';
+        chartCtx.fillText(Math.round(percentage) + '%', centerX, centerY + 15);
+        
+        chartCtx.restore();
+      }
+    };
+    
     new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [{
-          data: [value, Math.max(0, total - value)],
-          backgroundColor: [color, 'rgba(255,255,255,0.2)'],
+          data: [percentage, 100 - percentage],
+          backgroundColor: [color, '#e0e0e0'],
           borderWidth: 0
         }]
       },
       options: {
         cutout: '70%',
-        plugins: { legend: { display: false } }
-      }
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { 
+          legend: { display: false }
+        }
+      },
+      plugins: [centerPlugin]
     });
   }
 
   // Create donuts for first 3 clusters (you can add more if needed)
-  createDonutChart('cluster1Chart', counts[0] || 0, '#aee1f9');
-  createDonutChart('cluster2Chart', counts[1] || 0, '#8ad5c1');
-  createDonutChart('cluster3Chart', counts[2] || 0, '#f9e79f');
+  createDonutChart('cluster1Chart', counts[0] || 0, '#dc143c');
+  createDonutChart('cluster2Chart', counts[1] || 0, '#b22222');
+  createDonutChart('cluster3Chart', counts[2] || 0, '#ff4500');
 </script>
 
 
