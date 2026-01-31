@@ -1,12 +1,12 @@
 /* === Custom Dark Beige Sidebar === */
 .sidebar-dark-beige {
-  background: linear-gradient(180deg, #b49d74 0%, #bca882 100%) !important;
+  background: linear-gradient(180deg, #ff4646 0%, #fdb3b3 100%) !important;
   color: #222;
 }
 
 /* Brand / logo section */
 .sidebar-dark-beige .brand-link {
-  background-color: #bca882;
+  background-color: #ff4646;
   color: #000 !important;
   border-bottom: 1px solid #a8936d;
 }
@@ -26,26 +26,26 @@
 }
 
 .sidebar-dark-beige .nav-sidebar > .nav-item > .nav-link:hover {
-  background-color: #c4b28b;
+  background-color: #852323;
   color: #000;
 }
 
 .sidebar-dark-beige .nav-sidebar > .nav-item > .nav-link.active {
-  background-color: #b59d70 !important;
-  color: #fff !important;
+  background-color: #ff5c5c !important;
+  color: #2e1818 !important;
   font-weight: 600;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.20 );
 }
 
 /* Icons */
 .sidebar-dark-beige .nav-icon {
-  color: #5c4b2e !important;
+  color: #810101 !important;
   margin-right: 8px;
 }
 
 /* User panel section */
 .sidebar-dark-beige .user-panel {
-  border-bottom: 1px solid #b59d70;
+  border-bottom: 1px solid #810101;
 }
 
 .sidebar-dark-beige .user-panel a {
@@ -56,38 +56,38 @@
 /* Search bar */
 .sidebar-dark-beige .form-control-sidebar {
   background-color: #f6f1e5;
-  border: 1px solid #b8a376;
+  border: 1px solid #810101;
   color: #333;
 }
 
 .sidebar-dark-beige .btn-sidebar {
-  background-color: #bca882;
+  background-color: #cd3333;
   border: none;
   color: #000;
 }
 
 /* Treeview (sub-menu) */
 .sidebar-dark-beige .nav-treeview {
-  background-color: #e6dbc1;
-  border-left: 3px solid #b59d70;
+  background-color: #000000;
+  border-left: 3px solid #810101;
   margin-left: 8px;
   border-radius: 6px;
 }
 
 .sidebar-dark-beige .nav-treeview .nav-link {
-  color: #333;
+  color: #000000;
 }
 
 .sidebar-dark-beige .nav-treeview .nav-link:hover {
-  background-color: #d8c8a8;
+  background-color: #000000;
 }
 .logout-btn {
   margin-top: 40px; /* dagdag space mula sa huling item */
 }
 /* === Custom Dark Beige Navbar === */
 .navbar-dark-beige {
-  background-color: #bca882 !important; /* dark beige top bar */
-  border-bottom: 2px solid #a8936d;
+  background-color: #ff4646 !important; /* dark beige top bar */
+  border-bottom: 2px solid #230909;
   color: #000 !important;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
@@ -101,14 +101,14 @@
 
 .navbar-dark-beige .nav-link:hover {
   color: #3b2f1b !important;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
 }
 
 /* Dropdown menu under navbar */
 .navbar-dark-beige .dropdown-menu {
-  background-color: #e6dbc1;
+  background-color: #000000;
   border: 1px solid #b59d70;
 }
 

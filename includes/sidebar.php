@@ -27,14 +27,6 @@
     </div>
 
     <!-- Sidebar Search -->
-    <div class="form-inline">
-      <div class="input-group" data-widget="sidebar-search">
-        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-sidebar"><i class="fas fa-search fa-fw"></i></button>
-        </div>
-      </div>
-    </div>
 
     <!-- Menu -->
     <nav class="mt-2">
@@ -61,7 +53,7 @@
           <ul class="nav nav-treeview">
             <li class="nav-item"><a href="../role/add.roles.php" class="nav-link"><i class="fas fa-plus-circle nav-icon"></i><p>Add Role</p></a></li>
             <li class="nav-item"><a href="../role/list.roles.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Role List</p></a></li>
-            <li class="nav-item"><a href="../rooms/list.rooms.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Room List</p></a></li>
+            <li class="nav-item"><a href="../rooms/list.rooms.php" class="nav-link"><i class="fas fa-list nav-icon" ></i><p>Room List</p></a></li>
           </ul>
         </li>
 
@@ -71,24 +63,16 @@
             <i class="nav-icon fas fa-users"></i><p>Users<i class="fas fa-angle-left right"></i></p>
           </a>
           <ul class="nav nav-treeview">
-            <li class="nav-item"><a href="../users/add.users.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Add User</p></a></li>
-            <li class="nav-item"><a href="../employee/add.employee.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Add Employee</p></a></li>
-            <li class="nav-item"><a href="../users/list.users.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Users List</p></a></li>
-            <li class="nav-item"><a href="../guest/guest.list.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Guest List</p></a></li>
-            <li class="nav-item"><a href="../employee/list.employee.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Employee List</p></a></li>
+            <li class="nav-item"><a href="../users/add.users.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p style="color: black">Add User</p></a></li>
+            <li class="nav-item"><a href="../employee/add.employee.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p style="color: black">Add Employee</p></a></li>
+            <li class="nav-item"><a href="../users/list.users.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Users List</p></a></li>
+            <li class="nav-item"><a href="../guest/guest.list.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Guest List</p></a></li>
+            <li class="nav-item"><a href="../employee/list.employee.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Employee List</p></a></li>
           </ul>
         </li>
 
         <!-- Admin Search -->
-        <li class="nav-item has-treeview">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-search"></i><p>Search<i class="fas fa-angle-left right"></i></p>
-          </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item"><a href="pages/search/simple.html" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Simple Search</p></a></li>
-            <li class="nav-item"><a href="pages/search/enhanced.html" class="nav-link"><i class="far fa-circle nav-icon"></i><p>Enhanced Search</p></a></li>
-          </ul>
-        </li>
+
 
             <!-- Employee sidebar -->
         <?php break; case 'Employee': ?>

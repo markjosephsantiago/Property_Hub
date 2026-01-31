@@ -97,30 +97,13 @@ $total_price = $room_total + $food_total;
             <tr style="background-color: #e8f5e9;"><th>Total Price</th><td><strong style="color: #2e7d32;">₱<?= number_format($total_price, 2) ?></strong></td></tr>
         </table>
 
-        <form action="../booking/status.list.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
-            <input type="hidden" name="reservation_id" value="<?= $reservation_id ?>">
-            <input type="hidden" name="amount" value="<?= $total_price ?>">
-
-            <div class="form-group mt-3">
-                <label for="payment_method">Select Payment Method</label>
-                <select name="payment_method" id="payment_method" class="form-control" required>
-                    <option value="">-- Choose Method --</option>
-                    <option value="cash">Cash</option>
-                    <option value="gcash">GCash</option>
-                    <option value="credit_card">Credit Card</option>
-                </select>
-            </div>
-
-            <div class="form-group mt-3">
-                <label for="reference">Reference Number (if applicable)</label>
-                <input type="text" name="reference" id="reference" class="form-control" placeholder="Enter GCash or Card Reference">
-            </div>
+        <form action="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
+            if 
 
             <button type="submit" class="btn btn-primary btn-block mt-4">
-                <i class="fas fa-check-circle"></i> Confirm Payment
-            </button>
+                <i class="fas fa-check-circle"><a href="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkout&source=status" style="color: #d3fcfc"></i> Confirm Payment
+            </a></button>
         </form>
-
         <div class="text-center mt-3">
             <a href="booking.confirmation.php?code=<?= urlencode($booking['confirmation_code']) ?>" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Confirmation
