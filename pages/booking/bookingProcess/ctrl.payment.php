@@ -42,8 +42,8 @@ $insert = $conn->prepare("
 $insert->bind_param("isd", $reservation_id, $payment_method, $amount);
 $insert->execute();
 
-// ✅ Update reservation status to "paid"
-$update = $conn->prepare("UPDATE tbl_reservations SET status = 'paid' WHERE reservation_id = ?");
+// ✅ Update reservation status to "pending"
+$update = $conn->prepare("UPDATE tbl_reservations SET status = 'pending' WHERE reservation_id = ?");
 $update->bind_param("i", $reservation_id);
 $update->execute();
 
