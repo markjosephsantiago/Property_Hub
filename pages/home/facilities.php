@@ -1,24 +1,30 @@
 <?php include '../../includes/header.php'; ?>
 
 <!-- Facilities Section -->
-<section id="facilities" class="bg-light" style="padding:100px 0;">
+<section id="facilities" class="bg-light">
   <div class="container">
-    <h2 class="section-title">Our Facilities</h2>
-    <div class="row text-center">
-      <div class="col-md-4 mb-4">
-        <img src="../../dist/img/photo2.png" class="img-fluid rounded mb-3" alt="Comfortable Rooms">
-        <h5>Comfortable Rooms</h5>
-        <p>Enjoy well-maintained rooms designed for your comfort and relaxation.</p>
+    <h2 class="section-title">Our Premium Facilities</h2>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="facility-card">
+          <i class="fas fa-bed" style="font-size: 3rem; color: #dc143c;"></i>
+          <h5>Luxurious Rooms</h5>
+          <p>Experience comfort in our elegantly designed rooms featuring modern amenities, plush bedding, and stunning views.</p>
+        </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <img src="../../dist/img/wifi.png" class="img-fluid rounded mb-3" alt="Free WiFi">
-        <h5>Free WiFi</h5>
-        <p>Stay connected with fast and reliable internet throughout your stay.</p>
+      <div class="col-md-4">
+        <div class="facility-card">
+          <i class="fas fa-wifi" style="font-size: 3rem; color: #dc143c;"></i>
+          <h5>High-Speed WiFi</h5>
+          <p>Stay connected with complimentary high-speed internet throughout the property, perfect for work or leisure.</p>
+        </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <img src="../../dist/img/service.jpg" class="img-fluid rounded mb-3" alt="24/7 Service">
-        <h5>24/7 Service</h5>
-        <p>Our team is always available to provide you with the best experience.</p>
+      <div class="col-md-4">
+        <div class="facility-card">
+          <i class="fas fa-headset" style="font-size: 3rem; color: #dc143c;"></i>
+          <h5>24/7 Concierge</h5>
+          <p>Our dedicated team is always available to assist with reservations, recommendations, and special requests.</p>
+        </div>
       </div>
     </div>
   </div>

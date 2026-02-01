@@ -98,7 +98,6 @@ $total_price = $room_total + $food_total;
         </table>
 
         <form action="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
-            if 
 
             <button type="submit" class="btn btn-primary btn-block mt-4">
                 <i class="fas fa-check-circle"><a href="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkout&source=status" style="color: #d3fcfc"></i> Confirm Payment
