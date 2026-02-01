@@ -4,36 +4,56 @@ session_start();
 date_default_timezone_set('Asia/Manila');
 
 $filter = $_GET['filter'] ?? 'all';
+$search_code = $_GET['search_code'] ?? '';
 $title = "All Reservations";
 
-switch ($filter) {
-  case 'checkin':
-    $title = "All Check-Ins";
-    $query = "SELECT * FROM tbl_reservations WHERE status = 'checkin' ORDER BY checkin DESC";
-    break;
-  case 'checkout':
-    $title = "All Check-Outs";
-    $query = "SELECT * FROM tbl_reservations WHERE status = 'checkout' ORDER BY checkout DESC";
-    break;
-  case 'confirmed':
-    $title = "All Confirmed Reservations";
-    $query = "SELECT * FROM tbl_reservations WHERE status = 'confirmed' ORDER BY reservation_id DESC";
-    break;
-  case 'new':
-    $title = "New Reservations";
-    $query = "SELECT * FROM tbl_reservations WHERE status = 'pending' ORDER BY reservation_id DESC";
-    break;
-  case 'cancelled':
-    $title = "Cancelled Reservations";
-    $query = "SELECT * FROM tbl_reservations WHERE status = 'cancelled' ORDER BY reservation_id DESC";
-    break;
-  default:
-    $title = "All Reservations";
-    $query = "SELECT * FROM tbl_reservations ORDER BY reservation_id DESC";
-    break;
+// Base Query
+$sql = "SELECT * FROM tbl_reservations";
+$conditions = [];
+
+if (!empty($search_code)) {
+    // If searching, we prioritize the search result but can still respect status if needed. 
+    // Usually search overrides status filters for ease of finding a specific record.
+    $conditions[] = "confirmation_code LIKE '%" . $conn->real_escape_string($search_code) . "%'";
+    $title = "Search Result: " . htmlspecialchars($search_code);
+} else {
+    // Apply Status Filter
+    switch ($filter) {
+        case 'checkin':
+            $title = "All Check-Ins";
+            $conditions[] = "status = 'checkin'";
+            break;
+        case 'checkout':
+            $title = "All Check-Outs";
+            $conditions[] = "status = 'checkout'";
+            break;
+        case 'confirmed':
+            $title = "All Confirmed Reservations";
+            $conditions[] = "status = 'confirmed'";
+            break;
+        case 'new':
+            $title = "New Reservations";
+            $conditions[] = "status = 'pending'";
+            break;
+        case 'cancelled':
+            $title = "Cancelled Reservations";
+            $conditions[] = "status = 'cancelled'";
+            break;
+        default:
+            // All reservations
+            break;
+    }
 }
 
-$result = $conn->query($query);
+// Build Query
+if (!empty($conditions)) {
+    $sql .= " WHERE " . implode(" AND ", $conditions);
+}
+
+// Default ordering
+$sql .= " ORDER BY reservation_id DESC";
+
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +73,30 @@ $result = $conn->query($query);
 </head>
 
   <h3 class="mb-4"><?= htmlspecialchars($title) ?></h3>
+
+  <!-- Search Bar for Confirm Code (Admin/Employee) -->
+  <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Employee'])): ?>
+    <form action="" method="GET" class="mb-3">
+        <div class="input-group" style="width: 300px;">
+            <?php if(!empty($filter) && $filter != 'all'): ?>
+                <input type="hidden" name="filter" value="<?= htmlspecialchars($filter) ?>">
+            <?php endif; ?>
+            <input type="text" name="search_code" class="form-control" placeholder="Confirmation Code..." value="<?= htmlspecialchars($search_code) ?>">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <?php if (!empty($search_code)): ?>
+                <div class="input-group-append">
+                    <a href="status.list.php" class="btn btn-outline-secondary" title="Clear Search">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </form>
+  <?php endif; ?>
 
   <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -120,13 +164,13 @@ $result = $conn->query($query);
 
                 <!-- ✅ Check-in button -->
                 <?php if ($row['status'] == 'confirmed'): ?>
-                  <a href="bookingProcess/ctrl.update.status.php?id=<?= $row['reservation_id'] ?>&action=checkin&source=status" 
+                  <a href="checkin.form.php?reservation_id=<?= $row['reservation_id'] ?>" 
                     class="btn btn-sm btn-primary">Check In</a>
                 <?php endif; ?>
 
                 <!-- ✅ Check-out button -->
                 <?php if ($row['status'] == 'checkin'): ?>
-                  <a href="../booking/payment.form.php?reservation_id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
+                  <a href="payment.form.php?reservation_id=<?= $row['reservation_id'] ?>&action=checkout&source=status" 
                     class="btn btn-sm btn-info">Check Out</a>
                 <?php endif; ?>
 

@@ -13,9 +13,10 @@ $confirmation_code = $_GET['code'];
 
 // 🔍 Fetch booking details
 $stmt = $conn->prepare("
-    SELECT r.*, rm.room_number, rm.room_type, rm.price 
+    SELECT r.*, rm.room_number, rm.room_type, rm.price, pt.Payment_Type 
     FROM tbl_reservations r
     JOIN tbl_rooms rm ON r.room_id = rm.room_id
+    LEFT JOIN tbl_paymenttype pt ON r.Payment_Type_ID = pt.Payment_Type_ID
     WHERE r.confirmation_code = ?
     LIMIT 1
 ");
@@ -79,9 +80,22 @@ $booking = $result->fetch_assoc();
             <tr><th>Room</th><td>Room <?= htmlspecialchars($booking['room_number']) ?> - <?= htmlspecialchars($booking['room_type']) ?></td></tr>
             <tr><th>Check-in</th><td><?= date("F d, Y h:i A", strtotime($booking['checkin'])) ?></td></tr>
             <tr><th>Check-out</th><td><?= date("F d, Y h:i A", strtotime($booking['checkout'])) ?></td></tr>
-            <tr><th>Duration</th><td><?= $booking['duration'] ?> hour(s)</td></tr>
-            <tr><th>Total Price</th><td>₱<?= number_format($booking['price'] * ($booking['duration'] / 24), 2) ?></td></tr>
-            <tr><th>Status</th><td><span class="badge badge-warning text-uppercase"><?= $booking['status'] ?></span></td></tr>
+            <tr><th>Duration</th><td><?= $booking['duration'] ?> day(s)</td></tr>
+            <tr><th>Total Price</th><td>₱<?= number_format($booking['price'] * ($booking['duration']), 2) ?></td></tr>
+            <tr><th>Payment Method</th><td><?= htmlspecialchars($booking['Payment_Type'] ?? 'Not Selected') ?></td></tr>
+            <?php
+            $badge_class = 'badge-warning';
+            if (strtolower($booking['status']) === 'confirmed') {
+                $badge_class = 'badge-success';
+            } elseif (strtolower($booking['status']) === 'checkin') {
+                $badge_class = 'badge-info';
+            } elseif (strtolower($booking['status']) === 'checkout') {
+                $badge_class = 'badge-secondary';
+            } elseif (strtolower($booking['status']) === 'cancelled') {
+                $badge_class = 'badge-danger';
+            }
+            ?>
+            <tr><th>Status</th><td><span class="badge <?= $badge_class ?> text-uppercase"><?= $booking['status'] ?></span></td></tr>
             <tr><th>Confirmation Code</th><td><strong><?= $booking['confirmation_code'] ?></strong></td></tr>
         </table>
 

@@ -2,6 +2,13 @@
 session_start();
 require '../../../includes/conn.php';
 
+// Check if user is logged in and has permission
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Employee'])) {
+    $_SESSION['error'] = "Access denied.";
+    header("Location: ../../home.php");
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $room_id     = $_POST['room_id'];
     $room_number = $_POST['room_number'];

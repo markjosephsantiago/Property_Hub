@@ -2,7 +2,7 @@
 session_start();
 require '../../includes/conn.php';
 
-// ✅ Check kung may reservation_id sa URL
+// ✅ Check if reservation_id is in URL
 if (!isset($_GET['reservation_id'])) {
     $_SESSION['error'] = "No reservation found.";
     header("Location: booking.form.php");
@@ -42,7 +42,7 @@ $foodStmt->execute();
 $food_total = $foodStmt->get_result()->fetch_assoc()['food_total'] ?? 0;
 
 // ✅ Compute total price (room charge + food orders)
-$room_total = ($booking['price'] / 24) * $booking['duration'];
+$room_total = $booking['price'] * $booking['duration'];
 $total_price = $room_total + $food_total;
 ?>
 <!DOCTYPE html>
@@ -91,18 +91,30 @@ $total_price = $room_total + $food_total;
             <tr><th>Room</th><td>Room <?= htmlspecialchars($booking['room_number']) ?> - <?= htmlspecialchars($booking['room_type']) ?></td></tr>
             <tr><th>Check-in</th><td><?= date("F d, Y h:i A", strtotime($booking['checkin'])) ?></td></tr>
             <tr><th>Check-out</th><td><?= date("F d, Y h:i A", strtotime($booking['checkout'])) ?></td></tr>
-            <tr><th>Duration</th><td><?= $booking['duration'] ?> hour(s)</td></tr>
+            <tr><th>Duration</th><td><?= $booking['duration'] ?> day(s)</td></tr>
             <tr><th>Room Charge</th><td><strong>₱<?= number_format($room_total, 2) ?></strong></td></tr>
             <tr><th>Food Orders</th><td><strong>₱<?= number_format($food_total, 2) ?></strong></td></tr>
             <tr style="background-color: #e8f5e9;"><th>Total Price</th><td><strong style="color: #2e7d32;">₱<?= number_format($total_price, 2) ?></strong></td></tr>
         </table>
 
-        <form action="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
-            if 
+        <form action="bookingProcess/ctrl.checkout.php" method="POST">
+            <input type="hidden" name="reservation_id" value="<?= $reservation_id ?>">
+
+            <?php if (isset($booking['Payment_Type_ID']) && $booking['Payment_Type_ID'] == 2): ?>
+                <div class="form-group mt-3">
+                    <label for="amount_tendered">Amount Tendered (Cash):</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">₱</span>
+                        </div>
+                        <input type="number" name="amount_tendered" id="amount_tendered" class="form-control" placeholder="Enter amount..." min="0" step="0.01" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);" required>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <button type="submit" class="btn btn-primary btn-block mt-4">
-                <i class="fas fa-check-circle"><a href="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkout&source=status" style="color: #d3fcfc"></i> Confirm Payment
-            </a></button>
+                <i class="fas fa-check-circle"></i> Confirm Payment
+            </button>
         </form>
         <div class="text-center mt-3">
             <a href="booking.confirmation.php?code=<?= urlencode($booking['confirmation_code']) ?>" class="btn btn-outline-secondary">

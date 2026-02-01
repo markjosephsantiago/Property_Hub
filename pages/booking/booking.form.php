@@ -83,18 +83,18 @@ $result = mysqli_query($conn, $query);
 
                 <!-- Check-in -->
                 <div class="form-group mb-3">
-                    <label for="checkin">Check-in Date & Time</label>
-                    <input type="datetime-local" name="checkin" id="checkin" class="form-control" required>
+                    <label for="checkin">Check-in Date</label>
+                    <input type="date" name="checkin" id="checkin" class="form-control" required>
                 </div>
 
                 <!-- Duration -->
                 <div class="form-group mb-3">
-                    <label for="duration">Duration (Hours)</label>
+                    <label for="duration">Duration (Days)</label>
                     <select name="duration" id="duration" class="form-control" required>
-                        <option value="6">6 Hours</option>
-                        <option value="12">12 Hours</option>
-                        <option value="24">24 Hours</option>
-                        <option value="36">36 Hours</option>
+                        <option value="" disabled selected>-- Select Duration --</option>
+                        <?php for ($i = 1; $i <= 30; $i++) {
+                            echo "<option value='$i'>$i day(s)</option>";
+                        } ?>
                     </select>
                 </div>
 
@@ -112,66 +112,10 @@ $result = mysqli_query($conn, $query);
 
                 <!-- Submit -->
                 <button type="submit" class="btn btn-primary">
-                    <i href= "../booking/payment.form.php" class="fas fa-arrow-right"></i> Proceed
+                    <i class="fas fa-arrow-right"></i> Proceed
                 </button>
 
-                <!-- Recommendation Area -->
-                <div id="recommendationArea" class="mt-3"></div>
 
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Recommendation AJAX (only after form is complete) -->
-<script>
-$(document).ready(function(){
-    $('#bookingForm input, #bookingForm select').on('change keyup', function(){
-        var guestName = $('#guestName').val();
-        var email = $('#email').val();
-        var contact = $('#contact').val();
-        var roomType = $('#room_type').val();
-        var checkin = $('#checkin').val();
-        var duration = $('#duration').val();
-        var guestCount = $('#guest_count').val();
-
-        if(guestName && email && contact && roomType && checkin && duration && guestCount){
-            // All required fields filled → load recommendations
-            $.ajax({
-                type: 'POST',
-                url: 'recommendation.php',
-                data: { room_type: roomType },
-                success: function(response){
-                    $('#recommendationArea').html(response);
-                },
-                error: function(xhr, status, error){
-                    console.error('Error loading recommendations:', error);
-                }
-            });
-        } else {
-            $('#recommendationArea').html('');
-        }
-    });
-});
-// Kapag na-click ang recommended room
-$(document).on('click', '.recommend-room', function(){
-    var selectedRoomId = $(this).data('room-id');
-    var price = $(this).data('price');       // kung meron
-    var capacity = $(this).data('capacity'); // kung meron
-
-    $('#room_id').val(selectedRoomId);
-    $('#room_price').val(price);
-    $('#room_capacity').val(capacity);
-
-    // Highlight selected room
-    $('.recommend-room').removeClass('bg-primary text-white');
-    $(this).addClass('bg-primary text-white');
-});
-
-</script>
 
 </body>
 </html>

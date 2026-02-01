@@ -74,7 +74,7 @@ error_reporting(E_ALL);
           <div class="row">
             <div class="col"></div>
             <div class="col-md-auto">
-              <a href="../registration/add.registration.php" name="signin" class="btn btn-primary ">Register</a>
+
               <button type="submit" name="signin" class="btn btn-danger">Sign In</button>
               <p class="success-message"></p>
             </div>

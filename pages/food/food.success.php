@@ -87,7 +87,7 @@ $grand_total = $room_total + $food_total;
         </div>
 
         <div class="card-footer text-right">
-            <a href="../booking/booking.list.php" class="btn btn-secondary">Back</a>
+            <a href="../booking/status.list.php" class="btn btn-secondary">Back</a>
             <button onclick="window.print()" class="btn btn-primary">🖨 Print</button>
         </div>
     </div>

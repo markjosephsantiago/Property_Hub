@@ -61,7 +61,7 @@
           $booking_count = $conn->query("SELECT COUNT(*) AS total FROM tbl_reservations")->fetch_assoc()['total'];
           ?>
           <div class="col-lg-3 col-md-4 col-sm-6">
-            <a href="../booking/booking.list.php" class="text-decoration-none">
+            <a href="../booking/status.list.php" class="text-decoration-none">
               <div class="status-box">
                 <div class="status-header">Book a Room</div>
                 <div class="status-body"><?= $booking_count ?></div>

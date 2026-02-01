@@ -35,29 +35,15 @@ $foodStmt->execute();
 $food_total = $foodStmt->get_result()->fetch_assoc()['food_total'] ?? 0;
 
 // 🔹 Totals
-$room_total = $booking['price'] * ($booking['duration'] / 24);
+// 🔹 Totals
+// Consistent Logic: Duration is days.
+$room_total = $booking['price'] * $booking['duration']; 
 $grand_total = $room_total + $food_total;
+
+$tendered = $_GET['tendered'] ?? 0;
+$change = $_GET['change'] ?? 0;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Checkout Receipt</title>
-    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
-</head>
-<body class="bg-light">
-
-<div class="container mt-5">
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h4>🧾 Checkout Receipt</h4>
-        </div>
-
-        <div class="card-body">
-            <p><strong>Guest:</strong> <?= htmlspecialchars($booking['guestName']) ?></p>
-            <p><strong>Room:</strong> Room <?= $booking['room_number'] ?> (<?= $booking['room_type'] ?>)</p>
-
-            <hr>
-
+<!-- ... -->
             <h5>Charges</h5>
             <table class="table table-bordered">
                 <tr>
@@ -72,6 +58,16 @@ $grand_total = $room_total + $food_total;
                     <th>Total Bill</th>
                     <th>₱<?= number_format($grand_total, 2) ?></th>
                 </tr>
+                <?php if ($tendered > 0): ?>
+                    <tr>
+                        <th>Amount Tendered (Cash)</th>
+                        <td>₱<?= number_format($tendered, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Change</th>
+                        <td><strong>₱<?= number_format($change, 2) ?></strong></td>
+                    </tr>
+                <?php endif; ?>
             </table>
 
             <p><strong>Check-in:</strong> <?= date("M d, Y h:i A", strtotime($booking['checkin'])) ?></p>
@@ -79,11 +75,27 @@ $grand_total = $room_total + $food_total;
         </div>
 
         <div class="card-footer text-right">
-            <a href="status.list.php" class="btn btn-secondary">Back</a>
+            <span class="text-muted mr-3">Redirecting in <b id="timer">20</b>s...</span>
+            <a href="status.list.php" class="btn btn-secondary">Back Now</a>
             <button onclick="window.print()" class="btn btn-primary">🖨 Print</button>
         </div>
     </div>
 </div>
+
+<script>
+    let timeLeft = 20;
+    const timerElement = document.getElementById('timer');
+    
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            window.location.href = "status.list.php";
+        }
+    }, 1000);
+</script>
 
 </body>
 </html>

@@ -2,6 +2,13 @@
 require '../../includes/conn.php';
 session_start();
 
+// Check if user is logged in and has permission
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['Admin', 'Employee'])) {
+    $_SESSION['error'] = "Access denied. You do not have permission to view this page.";
+    header("Location: ../../home.php");
+    exit();
+}
+
 // Get room_id safely
 if (!isset($_GET['room_id'])) {
     $_SESSION['error'] = "Missing room ID.";

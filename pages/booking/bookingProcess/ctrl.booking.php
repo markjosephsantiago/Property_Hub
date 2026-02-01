@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // DATE FIX
     $checkin_raw = $_POST['checkin'];
-    $checkin = date('Y-m-d H:i:s', strtotime(str_replace('T', ' ', $checkin_raw)));
-    $checkout = date('Y-m-d H:i:s', strtotime("+{$duration} hours", strtotime($checkin)));
+    $checkin = date('Y-m-d', strtotime(str_replace('T', ' ', $checkin_raw)));
+    $checkout = date('Y-m-d', strtotime("+{$duration} days  ", strtotime($checkin)));
 
     // CONFIRMATION CODE
     $confirmation_code = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
@@ -92,14 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($stmt->execute()) {
+        $reservation_id = $stmt->insert_id;
 
-        // UPDATE ROOM STATUS
+        // 1️⃣ UPDATE ROOM STATUS
         $update = $conn->prepare("UPDATE tbl_rooms SET status = 'occupied' WHERE room_id = ?");
         $update->bind_param("i", $assigned_room_id);
         $update->execute();
 
-        $_SESSION['success'] = "Booking successful! Your confirmation code: <b>$confirmation_code</b>";
-        header("Location: ../booking.confirmation.php?code=" . urlencode($confirmation_code));
+        // 2️⃣ INITIALIZE PAYMENT STATUS (tbl_payment)
+        $payStmt = $conn->prepare("INSERT INTO tbl_payment (reservation_id, payment_status) VALUES (?, 'pending')");
+        $payStmt->bind_param("i", $reservation_id);
+        $payStmt->execute();
+
+        $_SESSION['success'] = "Booking successful! Please select a payment type. Code: <b>$confirmation_code</b>";
+        header("Location: ../payment.type.php?code=" . urlencode($confirmation_code));
         exit();
 
     } else {

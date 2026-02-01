@@ -108,17 +108,17 @@
 
 /* Dropdown menu under navbar */
 .navbar-dark-beige .dropdown-menu {
-  background-color: #000000;
-  border: 1px solid #b59d70;
+  background-color: #ff6767;
+  border: 1px solid #eb1818;
 }
 
 .navbar-dark-beige .dropdown-item {
-  color: #000 !important;
+  color: #000000 !important;
 }
 
 .navbar-dark-beige .dropdown-item:hover {
-  background-color: #d8c8a8;
-  color: #000 !important;
+  background-color: #ed2a2a;
+  color: #640000 !important;
 }
 
 /* Optional – curved bottom for softer look */
