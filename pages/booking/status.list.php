@@ -5,17 +5,26 @@ date_default_timezone_set('Asia/Manila');
 
 $filter = $_GET['filter'] ?? 'all';
 $search_code = $_GET['search_code'] ?? '';
+$search_guest = $_GET['search_guest'] ?? '';
 $title = "All Reservations";
 
 // Base Query
 $sql = "SELECT * FROM tbl_reservations";
 $conditions = [];
 
+// Search Logic
 if (!empty($search_code)) {
-    // If searching, we prioritize the search result but can still respect status if needed. 
-    // Usually search overrides status filters for ease of finding a specific record.
-    $conditions[] = "confirmation_code LIKE '%" . $conn->real_escape_string($search_code) . "%'";
-    $title = "Search Result: " . htmlspecialchars($search_code);
+    $code = $conn->real_escape_string($search_code);
+    $conditions[] = "confirmation_code LIKE '%$code%'";
+}
+
+if (!empty($search_guest)) {
+    $guest = $conn->real_escape_string($search_guest);
+    $conditions[] = "(guestName LIKE '%$guest%' OR email LIKE '%$guest%')";
+}
+
+if (!empty($search_code) || !empty($search_guest)) {
+    $title = "Search Results";
 } else {
     // Apply Status Filter
     switch ($filter) {
@@ -77,20 +86,30 @@ $result = $conn->query($sql);
   <!-- Search Bar for Confirm Code (Admin/Employee) -->
   <?php if (isset($_SESSION['role']) && in_array($_SESSION['role'], ['Admin', 'Employee'])): ?>
     <form action="" method="GET" class="mb-3">
-        <div class="input-group" style="width: 300px;">
+        <div class="form-row align-items-center">
             <?php if(!empty($filter) && $filter != 'all'): ?>
                 <input type="hidden" name="filter" value="<?= htmlspecialchars($filter) ?>">
             <?php endif; ?>
-            <input type="text" name="search_code" class="form-control" placeholder="Confirmation Code..." value="<?= htmlspecialchars($search_code) ?>">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
+            
+            <div class="col-auto">
+                <input type="text" name="search_code" class="form-control mb-2" placeholder="Confirmation Code" value="<?= htmlspecialchars($search_code) ?>">
             </div>
-            <?php if (!empty($search_code)): ?>
-                <div class="input-group-append">
-                    <a href="status.list.php" class="btn btn-outline-secondary" title="Clear Search">
-                        <i class="fas fa-times"></i>
+            
+            <div class="col-auto">
+                <div class="input-group mb-2">
+                    <input type="text" name="search_guest" class="form-control" placeholder="Guest Name or Email" value="<?= htmlspecialchars($search_guest) ?>">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($search_code) || !empty($search_guest)): ?>
+                <div class="col-auto">
+                    <a href="status.list.php" class="btn btn-outline-secondary mb-2" title="Clear Search">
+                        <i class="fas fa-times"></i> Clear
                     </a>
                 </div>
             <?php endif; ?>
@@ -147,7 +166,15 @@ $result = $conn->query($sql);
             <td><?= htmlspecialchars($row['guestName'] ?? '—') ?></td>
             <td><?= htmlspecialchars($row['email'] ?? '—') ?></td>
             <td><?= htmlspecialchars($row['contact'] ?? '—') ?></td>
-            <td class="text-center"><?= htmlspecialchars($row['room_id'] ?? '-') ?></td>
+            <td class="text-center">
+              <?php 
+                if ($row['room_id']) {
+                    echo htmlspecialchars($row['room_id']);
+                } else {
+                    echo '<span class="badge badge-secondary" title="Booked Category">' . htmlspecialchars($row['room_type'] ?? 'TBD') . '</span>';
+                }
+              ?>
+            </td>
             <td><?= date('M d, Y h:i A', strtotime($row['checkin'])) ?></td>
             <td><?= date('M d, Y h:i A', strtotime($row['checkout'])) ?></td>
             <td class="text-center">

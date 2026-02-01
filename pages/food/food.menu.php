@@ -42,8 +42,11 @@ $foods = mysqli_query($conn, "SELECT * FROM tbl_food_menu WHERE status = 'availa
 
 <div class="container mt-4">
     <div class="card">
-        <div class="card-header bg-warning">
+        <div class="card-header bg-warning d-flex justify-content-between align-items-center">
             <h5 class="mb-0">🍽️ Room Service – Food Menu</h5>
+            <a href="../dashboard/index.php" class="btn btn-dark btn-sm">
+                <i class="fas fa-chevron-left"></i> Back to Dashboard
+            </a>
         </div>
 
         <form action="ctrl.food.order.php" method="POST">

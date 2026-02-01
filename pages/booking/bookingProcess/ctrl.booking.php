@@ -26,46 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CONFIRMATION CODE
     $confirmation_code = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
 
-    /* ==========================================================
-       1. ROOM ASSIGNMENT LOGIC
-       ========================================================== */
-
-    if ($selected_room_id) {
-        // 👉 USER CLICKED A RECOMMENDED ROOM
-        $assigned_room_id = $selected_room_id;
-
-    } else {
-        // 👉 AUTO ASSIGN (NO RECOMMENDATION SELECTED)
-        $query = "
-            SELECT room_id 
-            FROM tbl_rooms
-            WHERE room_type = ?
-              AND status = 'available'
-              AND room_id NOT IN (
-                    SELECT room_id FROM tbl_reservations
-                    WHERE (
-                        checkin < ?
-                        AND checkout > ?
-                    )
-              )
-            ORDER BY room_id ASC
-            LIMIT 1
-        ";
-
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("sss", $room_type, $checkout, $checkin);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 0) {
-            $_SESSION['error'] = "No available rooms for the selected schedule.";
-            header("Location: ../booking.form.php");
-            exit();
-        }
-
-        $room = $result->fetch_assoc();
-        $assigned_room_id = $room['room_id'];
-    }
+    // NO EARLY ROOM ASSIGNMENT
+    // Specific room will be assigned by staff during check-in.
+    $assigned_room_id = null; // Use NULL instead of 0 for better database compatibility
 
     /* ==========================================================
        2. INSERT RESERVATION
@@ -73,14 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt = $conn->prepare("
         INSERT INTO tbl_reservations 
-        (user_id, room_id, guestName, email, contact, guest_count, checkin, checkout, duration, status, confirmation_code)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+        (user_id, room_id, room_type, guestName, email, contact, guest_count, checkin, checkout, duration, status, confirmation_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
     ");
 
     $stmt->bind_param(
-        "iississsis",
+        "iissssissis", 
         $user_id,
         $assigned_room_id,
+        $room_type,
         $guestName,
         $email,
         $contact,
@@ -94,10 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         $reservation_id = $stmt->insert_id;
 
-        // 1️⃣ UPDATE ROOM STATUS
-        $update = $conn->prepare("UPDATE tbl_rooms SET status = 'occupied' WHERE room_id = ?");
-        $update->bind_param("i", $assigned_room_id);
-        $update->execute();
+        // 1️⃣ ROOM STATUS - NOT UPDATED HERE
+        // Room status will be updated to 'occupied' at check-in.
 
         // 2️⃣ INITIALIZE PAYMENT STATUS (tbl_payment)
         $payStmt = $conn->prepare("INSERT INTO tbl_payment (reservation_id, payment_status) VALUES (?, 'pending')");

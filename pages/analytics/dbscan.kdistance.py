@@ -8,7 +8,7 @@ import numpy as np
 data = pd.read_csv("reservations.csv")
 
 # Clean and select numeric columns
-X = data[['guest_count', 'duration_days']].dropna()
+X = data[['guest_count', 'duration']].dropna()
 X_scaled = StandardScaler().fit_transform(X)
 
 # Compute nearest neighbors

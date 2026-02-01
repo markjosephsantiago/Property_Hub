@@ -13,13 +13,23 @@ require '../../includes/conn.php';
   <title>Franciscan Reservation | Add User</title>
   <?php require '../../includes/link.php'; ?>
   <style>
-    .add-user {
-      background-image: url('../../dist/img/photo2.png');
-      background-size: cover;
+    .content-wrapper { background-color: #f8f9fa !important; }
+    .card-modern {
+      border: none;
+      border-top: 4px solid #dc143c;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-radius: 8px;
     }
-    .card {
-      background-image: url("../../dist/img/white.jpg");
+    .card-modern .card-header {
+      background-color: #fff;
+      color: #333;
+      border-bottom: 1px solid #eee;
     }
+    .card-modern .card-title { font-weight: 700; color: #dc143c; }
+    .form-group label { color: #555; font-weight: 600; font-size: 0.9rem; }
+    .form-group label i { margin-right: 8px; color: #dc143c; width: 20px; text-align: center; }
+    .btn-crimson { background-color: #dc143c; border-color: #dc143c; color: #fff; font-weight: 600; padding: 10px 30px; }
+    .btn-crimson:hover { background-color: #b2112f; border-color: #b2112f; color: #fff; }
   </style>
 </head>
 
@@ -33,7 +43,7 @@ require '../../includes/conn.php';
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1>Add User</h1>
+              <h1 class="m-0" style="font-weight: 700; color: #333;">Add User</h1>
             </div>
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
@@ -47,34 +57,38 @@ require '../../includes/conn.php';
 
       <section class="content">
         <div class="row justify-content-center">
-          <div class="col-md-8">
-            <div class="card card-primary">
+          <div class="col-md-9">
+            <div class="card card-modern">
               <div class="card-header">
-                <h3 class="card-title">User Info</h3>
+                <h3 class="card-title">
+                  <i class="fas fa-user-plus mr-2"></i> New User Registration
+                </h3>
               </div>
               
               <form class="form" enctype="multipart/form-data" method="POST" action="usersData/ctrl.add.users.php">
-                <div class="card-body">
+                <div class="card-body p-4">
                   <div class="row">
                     <div class="form-group col-md-4">
-                      <label for="firstName">First Name</label>
-                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                      <label for="firstName"><i class="fas fa-id-card"></i> First Name</label>
+                      <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
                     </div>
                     <div class="form-group col-md-4">
-                      <label for="middleName">Middle Name</label>
-                      <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Middle Name">
+                      <label for="middleName"><i class="fas fa-id-card"></i> Middle Name</label>
+                      <input type="text" class="form-control" id="middleName" name="middleName" placeholder="Enter middle name">
                     </div>
                     <div class="form-group col-md-4">
-                      <label for="lastName">Last Name</label>
-                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                      <label for="lastName"><i class="fas fa-id-card"></i> Last Name</label>
+                      <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" required>
                     </div>
                   </div>
 
+                  <hr class="my-4">
+
                   <div class="row">
                     <div class="form-group col-md-6">
-                      <label for="role">Role</label>
+                      <label for="role"><i class="fas fa-user-tag"></i> Role Access</label>
                       <select required class="form-control select2" id="role" name="role">
-                        <option value="" disabled selected>Select Role</option>
+                        <option value="" disabled selected>Select Access Level</option>
                         <?php
                         $select_role = mysqli_query($conn, "SELECT * FROM tbl_roles");
                         while ($row = mysqli_fetch_array($select_role)) {
@@ -84,32 +98,36 @@ require '../../includes/conn.php';
                       </select>
                     </div>
                     <div class="form-group col-md-6">
-                      <label for="email">Email address</label>
-                      <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                      <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                      <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com" required>
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="form-group col-md-6">
-                      <label for="contact">Contact Number</label>
-                      <input type="text" class="form-control" id="contact" name="contact" placeholder="Contact Number" required>
+                      <label for="contact"><i class="fas fa-phone"></i> Contact Number</label>
+                      <input type="text" class="form-control" id="contact" name="contact" placeholder="09XX-XXX-XXXX" required>
                     </div>
                     <div class="form-group col-md-6">
-                      <label for="username">Username</label>
-                      <input type="text" class="form-control" id="username" name="username" placeholder="Username" required autocomplete="off">
+                      <label for="username"><i class="fas fa-user-circle"></i> Username</label>
+                      <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required autocomplete="off">
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="form-group col-md-6">
-                      <label for="password">Password</label>
-                      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required autocomplete="off">
+                      <label for="password"><i class="fas fa-lock"></i> Password</label>
+                      <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required autocomplete="off">
+                      <small class="text-muted">Minimum 8 characters with numbers and letters.</small>
                     </div>
                   </div>
                 </div>
 
-                <div class="card-footer">
-                  <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <div class="card-footer bg-white border-top-0 p-4">
+                  <button type="submit" name="submit" class="btn btn-crimson">
+                    <i class="fas fa-save mr-2"></i> Register User Account
+                  </button>
+                  <a href="../dashboard/index.php" class="btn btn-link text-muted ml-2">Cancel</a>
                 </div>
               </form>
             </div>

@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "../../includes/conn.php";
 
 // Fetch available room types
@@ -52,6 +53,24 @@ $result = mysqli_query($conn, $query);
         </div>
 
         <div class="card-body p-4">
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= $_SESSION['success'] ?>
+                    <?php unset($_SESSION['success']); ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php elseif (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= $_SESSION['error'] ?>
+                    <?php unset($_SESSION['error']); ?>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+            
             <form id="bookingForm" action="bookingProcess/ctrl.booking.php" method="POST">
 
                 <!-- Guest Info -->

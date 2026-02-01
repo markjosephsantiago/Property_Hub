@@ -38,25 +38,29 @@ class Reservation {
     public function checkIn($reservation_id, $new_room_id = null) {
         $this->conn->begin_transaction();
         try {
-            // Find current room
+            // Find current room (might be null for decoupled bookings)
             $old_room_id = $this->getRoomId($reservation_id);
-            if (!$old_room_id) throw new Exception("Room not found for this booking.");
 
-            // 1. Handle Room Swap if requested
-            if ($new_room_id && $new_room_id != $old_room_id) {
-                // Free old room
-                $freeStmt = $this->conn->prepare("UPDATE tbl_rooms SET status = 'available' WHERE room_id = ?");
-                $freeStmt->bind_param("i", $old_room_id);
-                $freeStmt->execute();
+            // 1. Handle Room Assignment/Swap
+            if ($new_room_id) {
+                // If there was an old room and it's different, free it
+                if ($old_room_id && $old_room_id != $new_room_id) {
+                    $freeStmt = $this->conn->prepare("UPDATE tbl_rooms SET status = 'available' WHERE room_id = ?");
+                    $freeStmt->bind_param("i", $old_room_id);
+                    $freeStmt->execute();
+                }
 
-                // Assign new room to reservation
-                $swapStmt = $this->conn->prepare("UPDATE tbl_reservations SET room_id = ? WHERE reservation_id = ?");
-                $swapStmt->bind_param("ii", $new_room_id, $reservation_id);
-                $swapStmt->execute();
+                // Assign (or update) room in reservation
+                $updateResStmt = $this->conn->prepare("UPDATE tbl_reservations SET room_id = ? WHERE reservation_id = ?");
+                $updateResStmt->bind_param("ii", $new_room_id, $reservation_id);
+                $updateResStmt->execute();
 
-                // Target room to occupy is now the new one
                 $target_room_id = $new_room_id;
             } else {
+                // No new room provided? Fallback to old if it exists
+                if (!$old_room_id) {
+                    throw new Exception("Please select a room to assign for this check-in.");
+                }
                 $target_room_id = $old_room_id;
             }
 
@@ -183,15 +187,16 @@ class Reservation {
             $update->bind_param("di", $grand_total, $reservation_id);
             $update->execute();
 
-            // 5. Update Food Orders
-            $foodUpdate = $this->conn->prepare("UPDATE tbl_food_orders SET order_status = 'served' WHERE reservation_id = ?");
-            $foodUpdate->bind_param("i", $reservation_id);
-            $foodUpdate->execute();
-
             // 6. Free Room
             $roomUpdate = $this->conn->prepare("UPDATE tbl_rooms SET status = 'available' WHERE room_id = ?");
             $roomUpdate->bind_param("i", $booking['room_id']);
             $roomUpdate->execute();
+
+            // 7. Record Payment for Sales Report
+            // Update the existing payment record with the final total and date
+            $payUpdate = $this->conn->prepare("UPDATE tbl_payment SET amount = ?, payment_date = NOW(), payment_status = 'paid' WHERE reservation_id = ?");
+            $payUpdate->bind_param("di", $grand_total, $reservation_id);
+            $payUpdate->execute();
 
             $this->conn->commit();
             return $grand_total;

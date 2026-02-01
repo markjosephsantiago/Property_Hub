@@ -10,7 +10,7 @@ $output = fopen('php://output', 'w');
 fputcsv($output, ['reservation_id', 'guest_count', 'checkin', 'checkout', 'duration_days']);
 
 // Get data from database
-$query = "SELECT reservation_id, guest_count, checkin, checkout, duration_days FROM tbl_reservations";
+$query = "SELECT reservation_id, guest_count, checkin, checkout, duration FROM tbl_reservations";
 $result = mysqli_query($conn, $query);
 
 while ($row = mysqli_fetch_assoc($result)) {

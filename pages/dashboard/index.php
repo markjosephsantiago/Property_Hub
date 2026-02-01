@@ -79,15 +79,6 @@
             </a>
           </div>
 
-          <!-- User Registrations -->
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <a href="../users/add.users.php" class="text-decoration-none">
-              <div class="status-box">
-                <div class="status-header">User Registrations</div>
-                <div class="status-body">Manage Users</div>
-              </div>
-            </a>
-          </div>
 
           <!-- Available Rooms -->
           <?php
@@ -168,53 +159,110 @@
           </div>
 
           <?php
-          // count records per cluster
-          $query = "SELECT cluster_label, COUNT(*) AS total FROM tbl_reservations GROUP BY cluster_label ORDER BY cluster_label";
-          $result = $conn->query($query);
-          $clusters = [];
-          $counts = [];
+          // Daily Sales Data
+          $sales_labels = [];
+          $sales_values = [];
+          for ($i = 6; $i >= 0; $i--) {
+              $date = date('Y-m-d', strtotime("-$i days"));
+              $sales_labels[$date] = date('M d', strtotime($date));
+              $sales_values[$date] = 0;
+          }
 
-          while ($row = $result->fetch_assoc()) {
-            $label = $row['cluster_label'] == -1 ? 'Noise' : 'Cluster ' . $row['cluster_label'];
-            $clusters[] = $label;
-            $counts[] = $row['total'];
+          $sales_query = mysqli_query($conn, "
+              SELECT DATE(payment_date) as p_date, SUM(amount) as total 
+              FROM tbl_payment 
+              WHERE payment_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+              GROUP BY DATE(payment_date)
+              ORDER BY p_date ASC
+          ");
+
+          while ($row = mysqli_fetch_assoc($sales_query)) {
+              if (isset($sales_values[$row['p_date']])) {
+                  $sales_values[$row['p_date']] = (float)$row['total'];
+              }
+          }
+
+          $js_labels = array_values($sales_labels);
+          $js_values = array_values($sales_values);
+
+          // Restore DBSCAN Data
+          $cluster_data = [];
+          $labels = [];
+          $counts = [];
+          $colors = ['#dc143c', '#b22222', '#ff4500', '#ffa500', '#ffd700', '#daa520'];
+
+          $dbscan_query = "SELECT cluster_label, COUNT(*) AS total, 
+                                  AVG(guest_count) as avg_guests, 
+                                  AVG(DATEDIFF(checkout, checkin)) as avg_duration
+                           FROM tbl_reservations 
+                           GROUP BY cluster_label 
+                           ORDER BY cluster_label";
+          $dbscan_result = $conn->query($dbscan_query);
+
+          $idx = 0;
+          while ($row = $dbscan_result->fetch_assoc()) {
+              if ($row['cluster_label'] == -1) {
+                  $label_full = "Outliers (Irregular)";
+              } else {
+                  $label_full = "Cluster " . $row['cluster_label'] . " (Avg " . round($row['avg_guests']) . " Guests, " . round($row['avg_duration']) . " Days)";
+              }
+              
+              $cluster_data[] = [
+                  'id' => $idx,
+                  'label' => $label_full,
+                  'count' => $row['total'],
+                  'color' => $colors[$idx % count($colors)]
+              ];
+              $labels[] = $label_full;
+              $counts[] = $row['total'];
+              $idx++;
           }
           ?>
 
           <div class="col-12">
             <div class="card p-4 text-dark rounded-3" style="background-color: #f8f9fa; border: 3px solid #dc143c; box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);">
               <h5 class="mb-4" style="color: #dc143c; font-size: 22px;">
+                <i class="fas fa-chart-line me-2"></i> Daily Sales Report (Last 7 Days)
+              </h5>
+
+              <div class="row">
+                <div class="col-12">
+                  <div style="background: white; padding: 25px; border-radius: 8px; border-left: 5px solid #dc143c; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <h6 style="color: #333; font-weight: 700; margin: 0;">Revenue Overview</h6>
+                      <span class="badge badge-danger p-2 px-3" style="border-radius: 20px; font-weight: 600;">Currency: PHP (₱)</span>
+                    </div>
+                    <canvas id="salesBarChart" style="width:100%; max-height:280px;"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 mt-4">
+            <div class="card p-4 text-dark rounded-3" style="background-color: #f8f9fa; border: 3px solid #dc143c; box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);">
+              <h5 class="mb-4" style="color: #dc143c; font-size: 22px;">
                 <i class="fas fa-project-diagram me-2"></i> DBSCAN Cluster Analysis
               </h5>
 
               <div class="row">
-                <!-- Bar Chart -->
                 <div class="col-lg-6 col-md-12">
                   <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c;">
-                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Cluster Overview</h6>
-                    <canvas id="dbscanChart" style="width:100%; max-height:280px;"></canvas>
+                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Distribution Trend</h6>
+                    <canvas id="dbscanLineChart" style="width:100%; max-height:250px;"></canvas>
                   </div>
                 </div>
 
-                <!-- Line Chart & Donut Charts Combined -->
                 <div class="col-lg-6 col-md-12">
                   <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c; height: 100%;">
-                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Distribution Trend & Analysis</h6>
-                    <canvas id="dbscanLineChart" style="width:100%; max-height:250px; margin-bottom: 20px;"></canvas>
-
+                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Cluster Analysis</h6>
                     <div class="d-flex justify-content-around text-center flex-wrap gap-2">
-                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #dc143c;">
-                        <canvas id="cluster1Chart" width="70" height="70"></canvas>
-                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 1</p>
-                      </div>
-                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #ff6b6b;">
-                        <canvas id="cluster2Chart" width="70" height="70"></canvas>
-                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 2</p>
-                      </div>
-                      <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid #ffa500;">
-                        <canvas id="cluster3Chart" width="70" height="70"></canvas>
-                        <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 12px;">Cluster 3</p>
-                      </div>
+                      <?php foreach ($cluster_data as $c): ?>
+                          <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid <?= $c['color'] ?>;">
+                            <canvas id="donutChart<?= $c['id'] ?>" width="70" height="70"></canvas>
+                            <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 11px;"><?= $c['label'] ?></p>
+                          </div>
+                      <?php endforeach; ?>
                     </div>
                   </div>
                 </div>
@@ -399,111 +447,79 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 </script>
-          <!-- Chart.js -->
-          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-          <script>
-          const ctx = document.getElementById('dbscanChart').getContext('2d');
-
-          const labels = <?php echo json_encode($clusters); ?>;
-          const data = <?php echo json_encode($counts); ?>;
-
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Number of Data Points',
-                data: data,
-                backgroundColor: [
-                  '#d6c6a1',
-                  '#a8c686',
-                  '#f1dca7',
-                  '#c9b6e4',
-                  '#f2b5b5',
-                  '#b4d8e7'
-                ],
-                borderWidth: 1,
-                borderColor: '#b8a382'
-              }]
-            },
-            options: {
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: { stepSize: 1 }
-                }
-              },
-              plugins: {
-                legend: { display: false },
-                title: {
-                  display: true,
-                  text: 'DBSCAN Cluster Distribution'
-                }
-              }
-            }
-          });
-          </script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Get PHP data into JS
-  const clusters = <?php echo json_encode($clusters); ?>;
-  const counts = <?php echo json_encode($counts); ?>;
-  const total = counts.reduce((a, b) => a + b, 0);
+  // Sales Chart Data
+  const salesLabels = <?php echo json_encode($js_labels); ?>;
+  const salesData = <?php echo json_encode($js_values); ?>;
 
-  // ===== BAR CHART =====
-  const barCtx = document.getElementById('dbscanChart').getContext('2d');
-  new Chart(barCtx, {
+  const salesCtx = document.getElementById('salesBarChart').getContext('2d');
+  new Chart(salesCtx, {
     type: 'bar',
     data: {
-      labels: clusters,
+      labels: salesLabels,
       datasets: [{
-        label: 'Number of Data Points',
-        data: counts,
-        backgroundColor: [
-          '#d6c6a1',
-          '#a8c686',
-          '#f1dca7',
-          '#c9b6e4',
-          '#f2b5b5',
-          '#b4d8e7'
-        ],
-        borderColor: '#b8a382',
-        borderWidth: 1
+        label: 'Daily Revenue',
+        data: salesData,
+        backgroundColor: 'rgba(220, 20, 60, 0.7)',
+        borderColor: '#dc143c',
+        borderWidth: 2,
+        borderRadius: 5,
+        borderSkipped: false,
       }]
     },
     options: {
       responsive: true,
       plugins: {
         legend: { display: false },
-        title: {
-          display: true,
-          text: 'DBSCAN Cluster Distribution'
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'Revenue: ₱' + context.raw.toLocaleString();
+            }
+          }
         }
       },
       scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return '₱' + value.toLocaleString();
+            },
+            font: { weight: '600' }
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: {
+          ticks: { font: { weight: '600' } },
+          grid: { display: false }
+        }
       }
     }
   });
 
-  // ===== LINE CHART =====
+  // DBSCAN Chart Data
+  const dbLabels = <?php echo json_encode($labels); ?>;
+  const dbCounts = <?php echo json_encode($counts); ?>.map(Number);
+  const clusterData = <?php echo json_encode($cluster_data); ?>;
+  const dbTotal = dbCounts.reduce((a, b) => a + b, 0);
+
+  // Line Chart
   const lineCtx = document.getElementById('dbscanLineChart').getContext('2d');
   new Chart(lineCtx, {
     type: 'line',
     data: {
-      labels: clusters,
+      labels: dbLabels,
       datasets: [{
         label: 'Cluster Size',
-        data: counts,
+        data: dbCounts,
         borderColor: '#dc143c',
         backgroundColor: 'rgba(220, 20, 60, 0.15)',
         fill: true,
         tension: 0.4,
         pointBackgroundColor: '#dc143c',
-        pointBorderWidth: 2,
-        pointBorderColor: '#fff',
         pointRadius: 6
       }]
     },
@@ -511,76 +527,58 @@ document.addEventListener('DOMContentLoaded', function () {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: {
-          ticks: { color: '#333', maxRotation: 45, minRotation: 45 }
-        },
-        y: {
-          ticks: { color: '#333' },
-          grid: { color: 'rgba(220, 20, 60, 0.1)' },
-          beginAtZero: true
-        }
+        x: { display: false },
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
       }
     }
   });
 
-  // ===== DONUT CHARTS =====
+  // Donut Charts
   function createDonutChart(id, value, color) {
-    const ctx = document.getElementById(id).getContext('2d');
-    
-    // Calculate percentage
-    const maxValue = Math.max(...counts);
-    const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
-    
-    const centerPlugin = {
-      id: 'centerText',
-      afterDatasetsDraw(chart) {
-        const { ctx: chartCtx, chartArea: { left, top, width, height } } = chart;
-        chartCtx.save();
-        
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-        
-        // Draw value
-        chartCtx.font = 'bold 18px Arial';
-        chartCtx.fillStyle = '#dc143c';
-        chartCtx.textAlign = 'center';
-        chartCtx.textBaseline = 'middle';
-        chartCtx.fillText(value, centerX, centerY - 5);
-        
-        // Draw percentage
-        chartCtx.font = 'bold 12px Arial';
-        chartCtx.fillStyle = '#666';
-        chartCtx.fillText(Math.round(percentage) + '%', centerX, centerY + 15);
-        
-        chartCtx.restore();
-      }
-    };
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const numericValue = parseInt(value);
+    const percentage = dbTotal > 0 ? (numericValue / dbTotal) * 100 : 0;
     
     new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [{
-          data: [percentage, 100 - percentage],
+          data: [numericValue, dbTotal - numericValue],
           backgroundColor: [color, '#e0e0e0'],
           borderWidth: 0
         }]
       },
       options: {
-        cutout: '70%',
-        responsive: true,
-        maintainAspectRatio: true,
+        cutout: '75%',
         plugins: { 
-          legend: { display: false }
+            legend: { display: false },
+            tooltip: { enabled: false }
         }
       },
-      plugins: [centerPlugin]
+      plugins: [{
+        id: 'centerText',
+        afterDatasetsDraw(chart) {
+          const { ctx, chartArea: { left, top, width, height } } = chart;
+          ctx.save();
+          const centerX = left + width / 2;
+          const centerY = top + height / 2;
+          ctx.font = 'bold 14px Arial';
+          ctx.fillStyle = color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(numericValue, centerX, centerY - 6);
+          ctx.font = 'bold 10px Arial';
+          ctx.fillStyle = '#666';
+          ctx.fillText(Math.round(percentage) + '%', centerX, centerY + 8);
+          ctx.restore();
+        }
+      }]
     });
   }
 
-  // Create donuts for first 3 clusters (you can add more if needed)
-  createDonutChart('cluster1Chart', counts[0] || 0, '#dc143c');
-  createDonutChart('cluster2Chart', counts[1] || 0, '#b22222');
-  createDonutChart('cluster3Chart', counts[2] || 0, '#ff4500');
+  clusterData.forEach(c => createDonutChart('donutChart' + c.id, c.count, c.color));
 </script>
 
 

@@ -23,7 +23,9 @@ while ($row = $result->fetch_assoc()) {
     $reservations[] = $row;
 }
 
-$cluster_sql = "SELECT cluster_label, COUNT(*) as count 
+$cluster_sql = "SELECT cluster_label, COUNT(*) as count, 
+                       AVG(guest_count) as avg_guests, 
+                       AVG(DATEDIFF(checkout, checkin)) as avg_duration
                 FROM tbl_reservations 
                 GROUP BY cluster_label 
                 ORDER BY cluster_label ASC";
@@ -32,7 +34,11 @@ $cluster_res = $conn->query($cluster_sql);
 $labels = [];
 $counts = [];
 while ($row = $cluster_res->fetch_assoc()) {
-    $labels[] = $row['cluster_label'];
+    if ($row['cluster_label'] == -1) {
+        $labels[] = "Outliers (Irregular)";
+    } else {
+        $labels[] = "Cluster " . $row['cluster_label'] . " (Avg " . round($row['avg_guests']) . " Guests, " . round($row['avg_duration']) . " Days)";
+    }
     $counts[] = $row['count'];
 }
 

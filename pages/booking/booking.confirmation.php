@@ -12,10 +12,13 @@ if (!isset($_GET['code'])) {
 $confirmation_code = $_GET['code'];
 
 // 🔍 Fetch booking details
+// If room_id is NULL (unassigned), we fetch the baseline price (MIN price) for that room_type from tbl_rooms
 $stmt = $conn->prepare("
-    SELECT r.*, rm.room_number, rm.room_type, rm.price, pt.Payment_Type 
+    SELECT r.*, rm.room_number, 
+           COALESCE(rm.price, (SELECT MIN(price) FROM tbl_rooms WHERE room_type = r.room_type)) as room_price, 
+           pt.Payment_Type 
     FROM tbl_reservations r
-    JOIN tbl_rooms rm ON r.room_id = rm.room_id
+    LEFT JOIN tbl_rooms rm ON r.room_id = rm.room_id
     LEFT JOIN tbl_paymenttype pt ON r.Payment_Type_ID = pt.Payment_Type_ID
     WHERE r.confirmation_code = ?
     LIMIT 1
@@ -77,12 +80,13 @@ $booking = $result->fetch_assoc();
             <tr><th>Guest Name</th><td><?= htmlspecialchars($booking['guestName']) ?></td></tr>
             <tr><th>Email</th><td><?= htmlspecialchars($booking['email']) ?></td></tr>
             <tr><th>Contact</th><td><?= htmlspecialchars($booking['contact']) ?></td></tr>
-            <tr><th>Room</th><td>Room <?= htmlspecialchars($booking['room_number']) ?> - <?= htmlspecialchars($booking['room_type']) ?></td></tr>
+            <tr><th>Room Category</th><td><?= htmlspecialchars($booking['room_type']) ?></td></tr>
+            <tr><th>Assigned Room</th><td><?= $booking['room_number'] ? "Room " . htmlspecialchars($booking['room_number']) : '<span class="text-muted">Will be assigned at Check-in</span>' ?></td></tr>
             <tr><th>Check-in</th><td><?= date("F d, Y h:i A", strtotime($booking['checkin'])) ?></td></tr>
             <tr><th>Check-out</th><td><?= date("F d, Y h:i A", strtotime($booking['checkout'])) ?></td></tr>
             <tr><th>Duration</th><td><?= $booking['duration'] ?> day(s)</td></tr>
-            <tr><th>Total Price</th><td>₱<?= number_format($booking['price'] * ($booking['duration']), 2) ?></td></tr>
-            <tr><th>Payment Method</th><td><?= htmlspecialchars($booking['Payment_Type'] ?? 'Not Selected') ?></td></tr>
+            <tr><th>Total Price</th><td>₱<?= number_format(($booking['room_price'] ?? 0) * ($booking['duration']), 2) ?></td></tr>
+            <tr><th>Payment Status</th><td><?= htmlspecialchars($booking['Payment_Type'] ?? 'Pending Selection') ?></td></tr>
             <?php
             $badge_class = 'badge-warning';
             if (strtolower($booking['status']) === 'confirmed') {

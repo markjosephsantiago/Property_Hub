@@ -34,7 +34,7 @@
         
         <!-- Dashboard -->
         <li class="nav-item">
-          <a href="../dashboard/index.php" class="nav-link active">
+          <a href="../dashboard/index.php" class="nav-link">
             <i class="nav-icon fas fa-tachometer-alt"></i>
             <p>Dashboard</p>
           </a>
@@ -63,11 +63,11 @@
             <i class="nav-icon fas fa-users"></i><p>Users<i class="fas fa-angle-left right"></i></p>
           </a>
           <ul class="nav nav-treeview">
-            <li class="nav-item"><a href="../users/add.users.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p style="color: black">Add User</p></a></li>
-            <li class="nav-item"><a href="../employee/add.employee.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p style="color: black">Add Employee</p></a></li>
-            <li class="nav-item"><a href="../users/list.users.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Users List</p></a></li>
-            <li class="nav-item"><a href="../guest/guest.list.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Guest List</p></a></li>
-            <li class="nav-item"><a href="../employee/list.employee.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p style="color: black">Employee List</p></a></li>
+            <li class="nav-item"><a href="../users/add.users.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Add User</p></a></li>
+            <li class="nav-item"><a href="../employee/add.employee.php" class="nav-link"><i class="fas fa-user-plus nav-icon"></i><p>Add Employee</p></a></li>
+            <li class="nav-item"><a href="../users/list.users.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Users List</p></a></li>
+            <li class="nav-item"><a href="../guest/guest.list.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Guest List</p></a></li>
+            <li class="nav-item"><a href="../employee/list.employee.php" class="nav-link"><i class="fas fa-list nav-icon"></i><p>Employee List</p></a></li>
           </ul>
         </li>
 

@@ -165,8 +165,8 @@ $notifCount = $notifList->num_rows;
           <i class="fas fa-cog mr-2"></i> Settings
         </a>
         <div class="dropdown-divider"></div>
-        <a class="nav-link" href="#" onclick="confirmLogout(event)">
-          <i class="fas fa-sign-out-alt"></i> Logout
+        <a class="dropdown-item" href="#" onclick="confirmLogout(event)">
+          <i class="fas fa-sign-out-alt mr-2"></i> Logout
         </a>
 
         <script>
