@@ -36,10 +36,11 @@ $booking = $res->fetch_assoc();
 
 // ✅ Insert payment record (no reference column)
 $insert = $conn->prepare("
-    INSERT INTO tbl_payment (reservation_id, payment_method, amount, payment_date)
-    VALUES (?, ?, ?, NOW())
+    INSERT INTO tbl_payment (reservation_id, payment_method, amount, payment_date, payment_status)
+    VALUES (?, ?, ?, NOW(), ?)
 ");
-$insert->bind_param("isd", $reservation_id, $payment_method, $amount);
+$status = 'paid';
+$insert->bind_param("isds", $reservation_id, $payment_method, $amount, $status);
 $insert->execute();
 
 // ✅ Update reservation status to "pending"
@@ -50,6 +51,6 @@ $update->execute();
 $_SESSION['success'] = "Payment successfully recorded for reservation #$reservation_id.";
 
 // ✅ Redirect to confirmation page
-header("Location: ../booking/booking.confirmation.php?code=" . urlencode($booking['confirmation_code']));
+header("Location: ../checkout.receipt.php?reservation_id=" . $reservation_id);
 exit();
 ?>

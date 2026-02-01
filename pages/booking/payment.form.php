@@ -97,14 +97,29 @@ $total_price = $room_total + $food_total;
             <tr style="background-color: #e8f5e9;"><th>Total Price</th><td><strong style="color: #2e7d32;">₱<?= number_format($total_price, 2) ?></strong></td></tr>
         </table>
 
-        <form action="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkin&source=status" method="POST">
+        <form action="bookingProcess/ctrl.payment.php" method="POST">
 
-            <button type="submit" class="btn btn-primary btn-block mt-4">
-                <i class="fas fa-check-circle"><a href="../booking/checkout.receipt.php?reservation_id=<?= $reservation_id ?>&action=checkout&source=status" style="color: #d3fcfc"></i> Confirm Payment
-            </a></button>
+            <input type="hidden" name="reservation_id" value="<?= $reservation_id ?>">
+            <input type="hidden" name="amount" value="<?= $total_price ?>">
+
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select name="payment_method" class="form-control" required>
+                    <option value="">Select payment method</option>
+                    <option value="Cash">Cash</option>
+                    <option value="GCash">GCash</option>
+                    <option value="Online Transfer">Online Transfer</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Confirm Payment
+            </button>
+
         </form>
+
         <div class="text-center mt-3">
-            <a href="booking.confirmation.php?code=<?= urlencode($booking['confirmation_code']) ?>" class="btn btn-outline-secondary">
+            <a href="../booking.confirmation.php?code=<?= urlencode($booking['confirmation_code']) ?>" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Confirmation
             </a>
         </div>
