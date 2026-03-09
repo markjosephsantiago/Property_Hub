@@ -7,10 +7,13 @@ from sklearn.preprocessing import LabelEncoder
 pd.set_option('future.no_silent_downcasting', True)
 
 conn = mysql.connector.connect(
-    host="localhost",
+    host="127.0.0.1",
     user="root",
     password="",
-    database="pms_db"
+    database="pms_db",
+    port=3307,
+    charset='utf8mb4',
+    collation='utf8mb4_general_ci'
 )
 
 cursor = conn.cursor()
@@ -48,12 +51,20 @@ features = df[['guest_count', 'duration_days', 'room_encoded', 'checkin_dayofwee
 
 scaler = StandardScaler()
 scaled_features = scaler.fit_transform(features) 
-print("Features scaled successfully.")
+
+# WEIGHTING: Focus on core guest behavior
+# Features: [0:guest_count, 1:duration_days, 2:room_encoded, 3:checkin_dayofweek]
+scaled_features[:, 0] = scaled_features[:, 0] * 3.0 # Primary
+scaled_features[:, 1] = scaled_features[:, 1] * 1.0 # Secondary
+scaled_features[:, 2] = scaled_features[:, 2] * 0.3 # Tertiary (Room #)
+scaled_features[:, 3] = scaled_features[:, 3] * 0.3 # Tertiary (Day of Week)
+
+print("Features scaled and weighted (Guest Count emphasized, Context de-emphasized).")
 
 
-dbscan = DBSCAN(eps=0.8, min_samples=5).fit(scaled_features) 
+dbscan = DBSCAN(eps=0.8, min_samples=3).fit(scaled_features) 
 df['cluster'] = dbscan.labels_
-print("Clustering completed!")
+print("Clustering completed with adjusted EPS!")
 
 
 for idx, row in df.iterrows():

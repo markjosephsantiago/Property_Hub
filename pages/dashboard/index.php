@@ -200,23 +200,34 @@
           $dbscan_result = $conn->query($dbscan_query);
 
           $idx = 0;
+          $total_reservations = 0;
           while ($row = $dbscan_result->fetch_assoc()) {
               if ($row['cluster_label'] == -1) {
-                  $label_full = "Outliers (Irregular)";
+                  $label_short = "Irregular";
+                  $label_full = "Outliers (Irregular Bookings)";
               } else {
-                  $label_full = "Cluster " . $row['cluster_label'] . " (Avg " . round($row['avg_guests']) . " Guests, " . round($row['avg_duration']) . " Days)";
+                  $label_short = "Consumer Segment " . ($row['cluster_label'] + 1);
+                  $label_full = $label_short . ": " . round($row['avg_guests']) . " Guests, " . round($row['avg_duration']) . " Days";
               }
               
+              $total_reservations += $row['total'];
               $cluster_data[] = [
                   'id' => $idx,
                   'label' => $label_full,
-                  'count' => $row['total'],
-                  'color' => $colors[$idx % count($colors)]
+                  'short_label' => $label_short,
+                  'count' => (int)$row['total'],
+                  'color' => $colors[$idx % count($colors)],
+                  'avg_guests' => round($row['avg_guests']),
+                  'avg_duration' => round($row['avg_duration'])
               ];
-              $labels[] = $label_full;
+              $labels[] = $label_short;
               $counts[] = $row['total'];
               $idx++;
           }
+
+          // Sort cluster_data by count to find insights
+          $insights_data = $cluster_data;
+          usort($insights_data, function($a, $b) { return $b['count'] - $a['count']; });
           ?>
 
           <div class="col-12">
@@ -241,28 +252,60 @@
 
           <div class="col-12 mt-4">
             <div class="card p-4 text-dark rounded-3" style="background-color: #f8f9fa; border: 3px solid #dc143c; box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);">
-              <h5 class="mb-4" style="color: #dc143c; font-size: 22px;">
-                <i class="fas fa-project-diagram me-2"></i> DBSCAN Cluster Analysis
-              </h5>
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 style="color: #dc143c; font-size: 22px; margin: 0;">
+                  <i class="fas fa-brain me-2"></i> Guest Preference Distribution
+                </h5>
+                <span class="text-muted small"><i class="fas fa-info-circle"></i> Statistical methodology for consumer preference categorization.</span>
+              </div>
 
               <div class="row">
-                <div class="col-lg-6 col-md-12">
-                  <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c;">
-                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Distribution Trend</h6>
-                    <canvas id="dbscanLineChart" style="width:100%; max-height:250px;"></canvas>
+                <!-- Master Segmentation Chart -->
+                <div class="col-lg-5 col-md-12 text-center mb-4 mb-lg-0">
+                  <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <h6 style="color: #333; font-weight: 700;" class="mb-4">Market Share</h6>
+                    <div style="position: relative; height: 250px;">
+                      <canvas id="masterClusterChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">Total Analyzed: <strong><?= $total_reservations ?></strong> Bookings</small>
+                    </div>
                   </div>
                 </div>
 
-                <div class="col-lg-6 col-md-12">
-                  <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #dc143c; height: 100%;">
-                    <h6 style="color: #333; margin-bottom: 15px; font-weight: 600;">Cluster Analysis</h6>
-                    <div class="d-flex justify-content-around text-center flex-wrap gap-2">
-                      <?php foreach ($cluster_data as $c): ?>
-                          <div style="background: #f0f0f0; padding: 12px; border-radius: 8px; flex: 1; border: 2px solid <?= $c['color'] ?>;">
-                            <canvas id="donutChart<?= $c['id'] ?>" width="70" height="70"></canvas>
-                            <p class="mt-2 text-dark mb-0" style="font-weight: 600; font-size: 11px;"><?= $c['label'] ?></p>
+                <!-- Insights Panel -->
+                <div class="col-lg-7 col-md-12">
+                  <div style="background: white; padding: 25px; border-radius: 12px; border-left: 6px solid #dc143c; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <h6 style="color: #333; font-weight: 700;" class="mb-4">Top Guest Insights</h6>
+                    <div class="row g-3">
+                      <?php 
+                      $top_count = 0;
+                      foreach ($insights_data as $c): 
+                        if ($c['id'] == -1 || $top_count >= 3) continue; // Skip outliers for main insights
+                        $percent = $total_reservations > 0 ? round(($c['count'] / $total_reservations) * 100) : 0;
+                        $top_count++;
+                      ?>
+                        <div class="col-12">
+                          <div class="p-3 rounded-3" style="background: #fff5f5; border: 1px solid #fed7d7;">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <span class="badge" style="background: <?= $c['color'] ?>; color: white;">Insight #<?= $top_count ?></span>
+                              <span class="text-muted small" style="font-weight: 600;"><?= $percent ?>% of Guests</span>
+                            </div>
+                            <p class="mt-2 mb-0" style="font-size: 15px; color: #4a5568;">
+                              Typically <strong><?= $c['avg_guests'] ?> guests</strong> staying for <strong><?= $c['avg_duration'] ?> days</strong>.
+                            </p>
                           </div>
+                        </div>
                       <?php endforeach; ?>
+                      
+                      <!-- Summary / Tooltip -->
+                      <div class="col-12 mt-2">
+                        <div class="p-3 rounded-3 bg-light border">
+                          <h6 class="small font-weight-bold text-uppercase text-muted mb-1">How to use this?</h6>
+                          <p class="small mb-0 text-dark">Use these patterns to tailor your room pricing or promotional bundles for the most frequent guest types.</p>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -500,85 +543,50 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // DBSCAN Chart Data
+  // DBSCAN Master Chart
   const dbLabels = <?php echo json_encode($labels); ?>;
   const dbCounts = <?php echo json_encode($counts); ?>.map(Number);
   const clusterData = <?php echo json_encode($cluster_data); ?>;
-  const dbTotal = dbCounts.reduce((a, b) => a + b, 0);
+  const dbColors = clusterData.map(c => c.color);
 
-  // Line Chart
-  const lineCtx = document.getElementById('dbscanLineChart').getContext('2d');
-  new Chart(lineCtx, {
-    type: 'line',
+  const masterCtx = document.getElementById('masterClusterChart').getContext('2d');
+  new Chart(masterCtx, {
+    type: 'doughnut',
     data: {
       labels: dbLabels,
       datasets: [{
-        label: 'Cluster Size',
         data: dbCounts,
-        borderColor: '#dc143c',
-        backgroundColor: 'rgba(220, 20, 60, 0.15)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#dc143c',
-        pointRadius: 6
+        backgroundColor: dbColors,
+        borderWidth: 2,
+        borderColor: '#ffffff'
       }]
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { display: false },
-        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 12,
+            font: { size: 11, weight: '600' }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(item) {
+              const label = dbLabels[item.dataIndex];
+              const value = dbCounts[item.dataIndex];
+              const total = dbCounts.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
       }
     }
   });
-
-  // Donut Charts
-  function createDonutChart(id, value, color) {
-    const canvas = document.getElementById(id);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const numericValue = parseInt(value);
-    const percentage = dbTotal > 0 ? (numericValue / dbTotal) * 100 : 0;
-    
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [numericValue, dbTotal - numericValue],
-          backgroundColor: [color, '#e0e0e0'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        cutout: '75%',
-        plugins: { 
-            legend: { display: false },
-            tooltip: { enabled: false }
-        }
-      },
-      plugins: [{
-        id: 'centerText',
-        afterDatasetsDraw(chart) {
-          const { ctx, chartArea: { left, top, width, height } } = chart;
-          ctx.save();
-          const centerX = left + width / 2;
-          const centerY = top + height / 2;
-          ctx.font = 'bold 14px Arial';
-          ctx.fillStyle = color;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(numericValue, centerX, centerY - 6);
-          ctx.font = 'bold 10px Arial';
-          ctx.fillStyle = '#666';
-          ctx.fillText(Math.round(percentage) + '%', centerX, centerY + 8);
-          ctx.restore();
-        }
-      }]
-    });
-  }
-
-  clusterData.forEach(c => createDonutChart('donutChart' + c.id, c.count, c.color));
 </script>
 
 

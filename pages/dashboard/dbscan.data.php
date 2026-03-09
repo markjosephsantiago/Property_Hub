@@ -2,7 +2,7 @@
 include "../../includes/conn.php";
 
 if (isset($_GET['run'])) {
-    $command = "\"C:/Users/santi/AppData/Local/Programs/Python/Python313/python.exe\" C:/wamp64/www/Property_Hub/dbscan.py";
+    $command = "\"C:/Users/Zaimon/AppData/Local/Microsoft/WindowsApps/PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0/python.exe\" C:/wamp64/www/Property_Hub/dbscan.py";
     $output = [];
     $return_var = 0;
     exec($command . " 2>&1", $output, $return_var);
@@ -27,6 +27,7 @@ $cluster_sql = "SELECT cluster_label, COUNT(*) as count,
                        AVG(guest_count) as avg_guests, 
                        AVG(DATEDIFF(checkout, checkin)) as avg_duration
                 FROM tbl_reservations 
+                WHERE checkin IS NOT NULL AND checkout IS NOT NULL
                 GROUP BY cluster_label 
                 ORDER BY cluster_label ASC";
 $cluster_res = $conn->query($cluster_sql);
@@ -50,3 +51,4 @@ echo json_encode([
         "counts" => $counts
     ]
 ]);
+?>

@@ -11,9 +11,9 @@ include "../../includes/conn.php";
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
     <div class="content-wrapper p-4">
-        <h2>📊 DBSCAN Clustering Dashboard</h2>
+        <h2>📊 Consumer Behavior Distribution Report</h2>
 
-        <button id="runDbscan" class="btn btn-primary mb-3">Run DBSCAN</button>
+        <button id="runDbscan" class="btn btn-primary mb-3">Initiate Statistical Processing</button>
 
         <table class="table table-bordered" id="resultTable">
             <thead>

@@ -183,8 +183,11 @@ class Reservation {
             $grand_total = $room_total + $food_total;
 
             // 4. Update Reservation
-            $update = $this->conn->prepare("UPDATE tbl_reservations SET status = 'checkout', total_bill = ? WHERE reservation_id = ?");
-            $update->bind_param("di", $grand_total, $reservation_id);
+            // Set status to 'checkout', total_bill, and REPLACE confirmation_code with a new purely random receipt code
+            // This invalidates the old login code but keeps a record for the receipt.
+            $new_code = 'CHK-' . strtoupper(substr(md5(uniqid()), 0, 8));
+            $update = $this->conn->prepare("UPDATE tbl_reservations SET status = 'checkout', total_bill = ?, confirmation_code = ? WHERE reservation_id = ?");
+            $update->bind_param("dsi", $grand_total, $new_code, $reservation_id);
             $update->execute();
 
             // 6. Free Room

@@ -22,7 +22,7 @@ $headers = array_shift($outliers);
 <body class="outlier-page">
   <div class="outlier-container">
     <h3 class="outlier-title">
-      <i class="fas fa-exclamation-triangle me-2"></i> Detected Outlier Reservations
+      <i class="fas fa-exclamation-triangle me-2"></i> Anomalous Booking Identification
     </h3>
 
     <div class="table-responsive">

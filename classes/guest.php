@@ -4,6 +4,7 @@ class Guest {
     private $table = "tbl_guest";
 
     public $guest_id;
+    public $user_id; // Added user_id link
     public $first_name;
     public $middle_name;
     public $last_name;
@@ -21,11 +22,12 @@ class Guest {
     // ✅ Create Guest
     public function create() {
         $sql = "INSERT INTO {$this->table} 
-                (first_name, middle_name, last_name, email, contact, address, id_type, id_number) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                (user_id, first_name, middle_name, last_name, email, contact, address, id_type, id_number) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
-            "ssssssss",
+            "issssssss",
+            $this->user_id,
             $this->first_name,
             $this->middle_name,
             $this->last_name,
@@ -56,11 +58,12 @@ class Guest {
     // ✅ Update Guest
     public function update() {
         $sql = "UPDATE {$this->table} 
-                SET first_name=?, middle_name=?, last_name=?, email=?, contact=?, address=?, id_type=?, id_number=? 
+                SET user_id=?, first_name=?, middle_name=?, last_name=?, email=?, contact=?, address=?, id_type=?, id_number=? 
                 WHERE guest_id=?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param(
-            "ssssssssi",
+            "issssssssi",
+            $this->user_id,
             $this->first_name,
             $this->middle_name,
             $this->last_name,

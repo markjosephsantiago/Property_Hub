@@ -40,14 +40,19 @@ $result = $conn->query($query);
 <body>
 
 <div class="container">
-    <div class="card selection-card">
-        <div class="card-header bg-primary text-white text-center">
-            <h3><i class="fas fa-wallet"></i> Select Payment Method</h3>
+    <div class="card selection-card border-0">
+        <div class="card-header text-white text-center rounded-top" style="background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);">
+            <h3 class="mb-0 py-2"><i class="fas fa-wallet me-2"></i> Payment Method</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
             
             <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
+                <div class="alert alert-success border-0 shadow-sm mb-4" style="background-color: #f8d7da; color: #842029; border-left: 5px solid #dc3545; border-radius: 10px;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle fa-2x me-3" style="color: #dc3545;"></i>
+                        <div><?= $_SESSION['success'] ?></div>
+                    </div>
+                </div>
                 <?php unset($_SESSION['success']); ?>
             <?php endif; ?>
 
@@ -71,8 +76,8 @@ $result = $conn->query($query);
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block mt-4">
-                    Proceed <i class="fas fa-chevron-right"></i>
+                <button type="submit" class="btn btn-danger btn-block mt-4 shadow-sm" style="background-color: #dc143c; border: none; font-weight: 600;">
+                    Proceed <i class="fas fa-chevron-right ms-1"></i>
                 </button>
             </form>
 

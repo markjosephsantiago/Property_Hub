@@ -1,0 +1,66 @@
+[
+    {
+        "cluster_id": 0,
+        "min_guests": 2,
+        "max_guests": 2,
+        "min_duration": 1,
+        "max_duration": 5,
+        "recommended_room": "standard"
+    },
+    {
+        "cluster_id": 1,
+        "min_guests": 1,
+        "max_guests": 1,
+        "min_duration": 1,
+        "max_duration": 3,
+        "recommended_room": "standard"
+    },
+    {
+        "cluster_id": 2,
+        "min_guests": 4,
+        "max_guests": 4,
+        "min_duration": 3,
+        "max_duration": 6,
+        "recommended_room": "Deluxe"
+    },
+    {
+        "cluster_id": 6,
+        "min_guests": 5,
+        "max_guests": 5,
+        "min_duration": 4,
+        "max_duration": 5,
+        "recommended_room": "Suite"
+    },
+    {
+        "cluster_id": 3,
+        "min_guests": 1,
+        "max_guests": 1,
+        "min_duration": 7,
+        "max_duration": 10,
+        "recommended_room": "standard"
+    },
+    {
+        "cluster_id": 4,
+        "min_guests": 5,
+        "max_guests": 5,
+        "min_duration": 6,
+        "max_duration": 8,
+        "recommended_room": "Suite"
+    },
+    {
+        "cluster_id": 5,
+        "min_guests": 3,
+        "max_guests": 3,
+        "min_duration": 3,
+        "max_duration": 6,
+        "recommended_room": "Deluxe"
+    },
+    {
+        "cluster_id": 7,
+        "min_guests": 6,
+        "max_guests": 6,
+        "min_duration": 7,
+        "max_duration": 9,
+        "recommended_room": "Suite"
+    }
+]

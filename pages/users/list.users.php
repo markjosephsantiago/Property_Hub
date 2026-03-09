@@ -69,7 +69,7 @@ require '../../includes/conn.php';
                                 }
                             ?>
                             <div class="alert alert-<?= $alertClass ?> alert-dismissible fade show" role="alert">
-                                <?= htmlspecialchars($_GET['msg']); ?>
+                                <?= htmlspecialchars($_GET['msg'] ?? ''); ?>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -142,7 +142,7 @@ require '../../includes/conn.php';
                                                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Are you sure you want to delete <b><?= htmlspecialchars($row['fullname']) ?></b>'s account?</p>
+                                                    <p>Are you sure you want to delete <b><?= htmlspecialchars($row['fullname'] ?? '') ?></b>'s account?</p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

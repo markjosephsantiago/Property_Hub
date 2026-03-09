@@ -2,9 +2,14 @@
 session_start();
 include "../../includes/conn.php";
 
-// Fetch available room types
-$query = "SELECT DISTINCT room_type FROM tbl_rooms WHERE status = 'available'";
+// Fetch available room types with details
+$query = "SELECT room_type, capacity, price, room_image FROM tbl_rooms WHERE status = 'available' GROUP BY room_type";
 $result = mysqli_query($conn, $query);
+
+// Fetch Max Capacity for Input Constraint
+$cap_query = "SELECT MAX(capacity) as max_cap FROM tbl_rooms";
+$cap_result = mysqli_query($conn, $cap_query);
+$max_capacity = mysqli_fetch_assoc($cap_result)['max_cap'] ?? 10; // Default to 10 if null
 ?>
 
 <!DOCTYPE html>
@@ -25,7 +30,7 @@ $result = mysqli_query($conn, $query);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .card-header {
-            background-color: #007bff;
+            background-color: #dc143c;
             color: #fff;
             border-radius: 12px 12px 0 0;
         }
@@ -41,6 +46,12 @@ $result = mysqli_query($conn, $query);
             width: 100%;
             font-size: 15px;
             padding: 8px 0;
+            background-color: #dc143c;
+            border-color: #dc143c;
+        }
+        .btn-primary:hover {
+            background-color: #c41235;
+            border-color: #c41235;
         }
     </style>
 </head>
@@ -89,17 +100,6 @@ $result = mysqli_query($conn, $query);
                     <input type="text" name="contact" id="contact" class="form-control" maxlength="11" pattern="\d{11}" placeholder="09XXXXXXXXX" required>
                 </div>
 
-                <!-- Room Type -->
-                <div class="form-group mb-3">
-                    <label for="room_type">Select Room Type</label>
-                    <select name="room_type" id="room_type" class="form-control" required>
-                        <option value="" disabled selected>-- Choose Room Type --</option>
-                        <?php while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<option value='{$row['room_type']}'>{$row['room_type']}</option>";
-                        } ?>
-                    </select>
-                </div>
-
                 <!-- Check-in -->
                 <div class="form-group mb-3">
                     <label for="checkin">Check-in Date</label>
@@ -119,8 +119,52 @@ $result = mysqli_query($conn, $query);
 
                 <!-- Guest Count -->
                 <div class="form-group mb-3">
-                    <label for="guest_count">Number of Guests</label>
-                    <input type="number" name="guest_count" id="guest_count" class="form-control" min="1" required>
+                    <label for="guest_count">Number of Guests (Max: <?= $max_capacity ?>)</label>
+                    <input type="number" name="guest_count" id="guest_count" class="form-control" min="1" max="<?= $max_capacity ?>" required>
+                </div>
+
+                <!-- Room Type -->
+                <div class="form-group mb-3">
+                    <label for="room_type">
+                        Select Room Type 
+                        <span id="recommendation-badge" class="badge badge-success d-none ml-2" style="font-size: 11px;">
+                            <i class="fas fa-magic"></i> Trending for you: <span id="recommended-type"></span>
+                        </span>
+                        <div id="recommendation-warning" class="text-warning d-none mt-1" style="font-size: 11px; font-style: italic;">
+                            <i class="fas fa-exclamation-triangle"></i> Note: All rooms of this type are currently occupied. Schedule is subject to change.
+                        </div>
+                    </label>
+                    <select name="room_type" id="room_type" class="form-control" required>
+                        <option value="" disabled selected>-- Select Room Type --</option>
+                        <?php 
+                        // Reset result pointer if needed (though it should be fine if group by is unique)
+                        mysqli_data_seek($result, 0);
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $displayText = $row['room_type'] . " (Cap: " . $row['capacity'] . " | ₱" . number_format($row['price'], 2) . ")";
+                            $imgSrc = !empty($row['room_image']) ? "../../uploads/rooms/" . $row['room_image'] : "../../dist/img/default-room.jpg";
+                            
+                            echo "<option value='{$row['room_type']}' 
+                                    data-price='{$row['price']}' 
+                                    data-capacity='{$row['capacity']}' 
+                                    data-image='$imgSrc'
+                                    data-original-text='$displayText'>
+                                    $displayText
+                                  </option>";
+                        } ?>
+                    </select>
+                </div>
+
+                <!-- Selected Room Image Preview -->
+                <div class="form-group mb-3 d-none" id="room-preview-container">
+                    <label>Room Preview</label>
+                    <div class="text-center">
+                        <img id="room-image-preview" src="" alt="Room Preview" class="img-fluid rounded shadow-sm" style="max-height: 200px; width: 100%; object-fit: cover;">
+                        <p class="mt-2 text-muted" style="font-size: 13px;">
+                            <i class="fas fa-info-circle"></i> 
+                            Capacity: <span id="preview-capacity" class="font-weight-bold"></span> | 
+                            Price: <span id="preview-price" class="font-weight-bold text-success"></span>
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Hidden User ID -->
@@ -133,8 +177,86 @@ $result = mysqli_query($conn, $query);
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-arrow-right"></i> Proceed
                 </button>
+            </form>
+        </div>
+    </div>
+</div>
 
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Handle Room Type Change
+    $('#room_type').on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const price = selectedOption.data('price');
+        const capacity = selectedOption.data('capacity');
+        const image = selectedOption.data('image');
 
+        // Update hidden fields
+        $('#room_price').val(price);
+        $('#room_capacity').val(capacity);
+
+        // Update Preview
+        if (image) {
+            $('#room-image-preview').attr('src', image);
+            $('#preview-capacity').text(capacity + ' Guests');
+            $('#preview-price').text('₱' + parseFloat(price).toLocaleString('en-US', {minimumFractionDigits: 2}));
+            $('#room-preview-container').removeClass('d-none');
+        } else {
+            $('#room-preview-container').addClass('d-none');
+        }
+    });
+
+    function getRecommendation() {
+        const guestCount = $('#guest_count').val();
+        let duration = $('#duration').val();
+
+        // Default duration to 1 if not selected
+        if (!duration) duration = 1;
+
+        if (guestCount > 0) {
+            $.ajax({
+                url: 'get_recommendation.php',
+                type: 'GET',
+                data: { guest_count: guestCount, duration: duration },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.recommendation) {
+                        $('#recommended-type').text(response.recommendation);
+                        $('#recommendation-badge').removeClass('d-none');
+                        
+                        // Show warning if applicable
+                        if (response.warning) {
+                            $('#recommendation-warning').removeClass('d-none');
+                        } else {
+                            $('#recommendation-warning').addClass('d-none');
+                        }
+                        
+                        // Highlight the recommended option in the select
+                        $('#room_type option').each(function() {
+                            if ($(this).val() === response.recommendation) {
+                                $(this).text($(this).data('original-text') + ' (Trending)');
+                                $(this).css('font-weight', 'bold');
+                                $(this).css('color', '#dc143c');
+                            } else {
+                                $(this).text($(this).data('original-text'));
+                                $(this).css('font-weight', 'normal');
+                                $(this).css('color', 'inherit');
+                            }
+                        });
+                    } else {
+                        $('#recommendation-badge').addClass('d-none');
+                        $('#recommendation-warning').addClass('d-none');
+                    }
+                }
+            });
+        }
+    }
+
+    // Trigger on guest count or duration change
+    $('#guest_count, #duration').on('input change', getRecommendation);
+});
+</script>
 
 </body>
 </html>

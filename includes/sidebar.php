@@ -1,7 +1,7 @@
 <aside class="main-sidebar sidebar-dark-beige elevation-4">
   <!-- Brand Logo -->
-  <a href="../dashboard/index.php" class="brand-link">
-    <img src="../../dist/img/FHLoginIcon.png" alt="Franciscan Reservation Logo" class="brand-image elevation-3" style="opacity: .8; max-width: 100%; height: auto;">
+  <a href="/Property_Hub/pages/dashboard/index.php" class="brand-link">
+    <img src="/Property_Hub/dist/img/FHLoginIcon.png" alt="Franciscan Reservation Logo" class="brand-image elevation-3" style="opacity: .8; max-width: 100%; height: auto;">
     <span class="brand-text font-weight-light">Franciscan Reservation</span>
   </a>
 
@@ -80,6 +80,11 @@
         <li class="nav-item">
           <a href="../rooms/list.rooms.php" class="nav-link">
             <i class="nav-icon fas fa-list"></i><p>Room List</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="../guest/guest.list.php" class="nav-link">
+            <i class="nav-icon fas fa-user-friends"></i><p>Guest List</p>
           </a>
         </li>
          

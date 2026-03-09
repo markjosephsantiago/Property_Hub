@@ -93,8 +93,9 @@ $roomQuery->execute();
 $rooms = $roomQuery->get_result();
 ?>
                     <select name="room_id" id="room_select" class="form-control" required onchange="updateRoomDetails()">
-                        <option value="" disabled <?= !$booking['room_id'] ? 'selected' : '' ?>>-- Select Room to Assign --</option>
-                        <?php while ($r = $rooms->fetch_assoc()): 
+                        <?php 
+                        $first_available_found = false;
+                        while ($r = $rooms->fetch_assoc()): 
                             $is_current = ($r['room_id'] == $booking['room_id']);
                             $is_occupied = ($r['status'] === 'occupied');
                             
@@ -109,9 +110,20 @@ $rooms = $roomQuery->get_result();
                                 $status_text = "Occupied by another guest";
                                 $disabled = "disabled"; 
                             }
+
+                            // Auto-select logic: if no room is assigned, select the first available one
+                            $selected = "";
+                            if ($booking['room_id']) {
+                                if ($is_current) $selected = "selected";
+                            } else {
+                                if (!$first_available_found && $r['status'] === 'available') {
+                                    $selected = "selected";
+                                    $first_available_found = true;
+                                }
+                            }
                         ?>
                             <option value="<?= $r['room_id'] ?>" 
-                                <?= $is_current ? 'selected' : '' ?> 
+                                <?= $selected ?> 
                                 <?= $disabled ?>
                                 data-number="<?= $r['room_number'] ?>"
                                 data-type="<?= htmlspecialchars($r['room_type']) ?>"
@@ -164,8 +176,7 @@ function updateRoomDetails() {
 
 // Ensure JS is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Optional: initial sync if needed
-    // updateRoomDetails();
+    updateRoomDetails();
 });
 </script>
 </body>
